@@ -1,0 +1,31 @@
+---
+title: "data_exploration.rmd"
+author: "Fergal Stapleton"
+date: "03/04/2020"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cloropleth Map
+
+```{r}
+#install.packages('tidyverse')
+suppressWarnings(library(tidyverse))
+
+# Load in data
+hp <- read.csv('../data/PPR-ALL.csv')
+
+# Give dataset more code friendly header
+names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","desc","size_desc")
+
+# Remove euro symbol from price values
+hp$price <- gsub('[\200]','', hp$price)
+
+# Convert to dplyr tibble
+hp <- as.tibble(hp)
+
+head(hp)
+```

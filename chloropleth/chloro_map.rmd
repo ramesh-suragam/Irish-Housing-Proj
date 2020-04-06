@@ -23,6 +23,10 @@ names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","d
 
 # Remove euro symbol from price values
 hp$price <- gsub('[\200]','', hp$price)
+hp$price <- gsub(',','', hp$price)
+hp$price <- gsub('\\.','', hp$price)
+
+hp$price <- as.numeric(hp$price)
 
 # Convert to dplyr tibble
 hp <- as.tibble(hp)

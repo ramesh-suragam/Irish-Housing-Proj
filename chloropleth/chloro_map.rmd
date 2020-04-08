@@ -32,4 +32,33 @@ hp$price <- as.numeric(hp$price)
 hp <- as.tibble(hp)
 
 head(hp)
+
+
+```
+
+Next we will source and load in the shape file that we will use in our chloropleth map. The data.gov.ie website has a resource published ny the Ordnance Survey Ireland group which divides Ireland into individual counties.
+
+Source for counties shape file:
+https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6
+
+```{r}
+library(rgdal)
+library(ggmap)
+library(maptools)
+library(rgeos)
+ire <- readOGR(dsn='../data', 
+               layer='Counties__OSi_National_Statutory_Boundaries__Generalised_20m',
+               stringsAsFactors = FALSE)
+
+names(ire)
+
+
+counties <- fortify(ire, region = 'GUID')
+
+#Basic plot prior to adding analysis
+ggplot() +
+  geom_polygon(data = counties, aes( x = long, y = lat, group = group), fill="Forest Green", color="Black") +
+  theme_void() 
+
+
 ```

@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #install.packages('tidyverse')
 suppressWarnings(library(tidyverse))
+library(lubridate)
 
 # Load in data
 hp <- read.csv('../data/PPR-ALL.csv')
@@ -24,12 +25,58 @@ names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","d
 # Remove euro symbol from price values
 hp$price <- gsub('[\200]','', hp$price)
 hp$price <- gsub(',','', hp$price)
-hp$price <- gsub('\\.','', hp$price)
+#hp$price <- gsub('\\.','', hp$price)
 
 hp$price <- as.numeric(hp$price)
+#hp$sale_date <- as.POSIXlt(hp$sale_date)
+hp$sale_date<-dmy(hp$sale_date)
+hp$year<-year(hp$sale_date)
 
 # Convert to dplyr tibble
-hp <- as.tibble(hp)
+hp <- as_tibble(hp)
+
+# Filter 2010 data and calculate means
+hp2010 <-
+  hp %>%
+  filter(year == 2010) %>%
+  group_by(county) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+# Filter 2020 data and calculate means
+hp2020 <-
+  hp %>%
+  filter(year == 2020) %>%
+  group_by(county) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+# Filter all data and calculate means
+hp_means <-
+  hp %>%
+  group_by(county, year) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+quantile(hp$mean, seq(0, 1, 0.1))
+
+tmp.levels <- c(60000, 120000, 180000, 240000, 300000,
+                360000, 420000, 480000, 540000, 600000)
+tmp.labels <- c('60k - 120k',   '120k - 180k', '180k - 240k', '240k - 300k',
+                '300k - 360k', '360k - 420k', '420k - 480k', '480k - 540k', '540k - 600k')
+
+colr <- colorRampPalette(c('#ffffff', '#cfa35c','#512888'))
+tmp.colors <- colr(9)
+names(tmp.colors) <- tmp.labels
+hp_means$fc <- factor(
+  cut(hp_means$mean, tmp.levels),
+  labels = tmp.labels
+)
+
+hp_means$county = toupper(hp_means$county)
+
+hp2020 <-
+  hp_means %>%
+  filter(year == 2020) %>%
+  group_by(county) %>%
+  summarize(mean = mean, fc = fc)
 
 head(hp)
 
@@ -46,6 +93,7 @@ library(rgdal)
 library(ggmap)
 library(maptools)
 library(rgeos)
+library(mapproj)
 ire <- readOGR(dsn='../data', 
                layer='Counties__OSi_National_Statutory_Boundaries__Generalised_20m',
                stringsAsFactors = FALSE)
@@ -53,12 +101,23 @@ ire <- readOGR(dsn='../data',
 names(ire)
 
 
-counties <- fortify(ire, region = 'GUID')
+counties <- fortify(ire, region = 'COUNTY')
 
 #Basic plot prior to adding analysis
 ggplot() +
   geom_polygon(data = counties, aes( x = long, y = lat, group = group), fill="Forest Green", color="Black") +
   theme_void() 
+
+ggplot(hp2020) +
+  geom_map(aes(map_id=county, fill=fc), map=counties, color="Black") +
+  coord_map() +
+  expand_limits(x = counties$long, y = counties$lat) +
+  theme_void()
+    
+
+```
+
+```{r}
 
 
 ```

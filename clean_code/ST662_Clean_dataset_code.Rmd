@@ -1,0 +1,94 @@
+---
+title: "Clean_dataset_code"
+author: "Fiona Devaney"
+date: "4/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries
+```{r}
+suppressMessages(library(tidyverse))
+suppressMessages(library(lubridate))
+```
+
+## Load PPR dataset
+```{r}
+hp <- read.csv("PPR-ALL.csv", header=F) 
+# header=F as wouldn't load otherwise due to euro symbol for price
+
+# Add column names
+names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","desc","size_desc")
+# same as Fergal's for consistency
+
+# Remove redundant header names (row 1)
+hp<-hp[-1, ] 
+
+# Remove redundant variables (post_code and size_desc)
+hp<-hp[,-c(3,9)]
+```
+
+## Manipulate sale_date variable
+```{r}
+hp$sale_date<-dmy(hp$sale_date)
+hp$year<-year(hp$sale_date)
+```
+
+## Manipulate address and county variables - change to all lower case
+```{r}
+# remove funny symbols from address
+hp$address <-str_replace_all(hp$address,"[^[:graph:]]", " ")
+
+# change addresses to all lowercase to facilitate town name search
+hp <- hp %>% mutate(address = tolower(address))
+hp <- hp %>% mutate(county = tolower(county))
+```
+
+## Manipulate price variable 
+```{r}
+# Remove euro symbol and comma from price values
+hp$price <- gsub('[\x80]','', hp$price)
+hp$price <- gsub('[,]','', hp$price)
+
+# convert price to numeric
+hp1 <- hp %>% mutate_at("price", as.numeric)
+
+# make all values inclusive of VAT (new property: the price shown should be exclusive of VAT at 13.5%)
+hp1$price_adj <- ifelse(hp1$vx =='Yes', hp1$price*1.135, hp1$price*1)
+```
+
+## Outlier check
+```{r}
+# check for missing values
+hp1[!complete.cases(hp1),] 
+# no missing values
+
+# how many properties are not the full market price
+nfmp <- subset(hp1, nfmp=="Yes") 
+# 20256 obs (nearly 5% of the dataset) - we've decided to keep these in the dataset
+
+# check how many really large and really low values we have
+f <- fivenum(hp1$price_adj)
+# there is a huge jump between the minimum value and lower quartile, and similarly between the upper quartile and maximum value
+
+# number of outliers
+length(boxplot.stats(hp1$price_adj)$out) 
+# 22145. However threshold for high house price outliers is 586452.50, which is too low in my opinion.
+
+# Unusual house prices will be addressed in the next chunk of code.
+```
+
+## Multi-unit properites
+```{r}
+# Remove properties which are >10 million as these are most likely multi-unit properties
+hp2 <- subset(hp1, price_adj <= 10000000)
+
+# There are issues with the multi-unit properties due to the fact that they are not consistently recorded within the dataset. Some are entered as a range, however others use text ('XXX apts' or 'apartments') or '&' etc. 
+
+# Fergal has worked on some code to address some of the issues arising from multi-unit properties and will add it here:
+
+
+```

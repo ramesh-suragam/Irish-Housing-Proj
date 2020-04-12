@@ -1,0 +1,164 @@
+---
+title: "HP_workings"
+author: "Ramesh Suragam"
+date: "4/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Loading libraries
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+```{r}
+#Loading Data
+
+#Reading the data, Excluding the header since the euro sign is creating a error loading the data because of the encoding issues.
+hp <- read.csv("data/PPR-ALL.csv", header = FALSE)
+
+#Setting the header values
+names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","desc","size_desc")
+
+#Removing the extra header
+hp<-hp[-1, ]
+
+head(hp)
+```
+
+```{r}
+#Data Cleaning
+
+hp$price <- gsub('[\x80]','', hp$price)
+hp$price <- gsub('[,]','', hp$price)
+
+hp$address <- as.character(hp$address)
+hp$county     <- as.factor(hp$county)
+hp$nfmp       <- as.factor(hp$nfmp)
+hp$vx         <- as.factor(hp$vx)
+hp$sale_date  <- as.Date(hp$sale_date)
+hp$price      <- as.numeric(hp$price)/1e6
+
+head(hp)
+
+# county_freq <- count(hp, county, sort = TRUE, name = 'freq')
+# 
+# county_freq
+# 
+# county %in% county_freq[1:5,1]
+
+ggplot(subset(hp,(county=='Dublin'| county == 'Cork'|county=='Galway'| county == 'Kildare'|county=='Meath')), mapping = aes(x=county, y=price, fill=county)) +
+  geom_violin()
+```
+
+```{r}
+update.packages("ggmap")
+library(ggmap)
+
+head(hp)
+
+#register_google(key = "AIzaSyAbYItaN6ELGi2bSKtY2bkVKIgKNbix7A4")
+
+for(i in 1:nrow(hp)){
+  result <- geocode(hp$address[i], output = "latlona", source = "google")
+  hp$lon[i] <- as.numeric(result[1])
+  hp$lat[i] <- as.numeric(result[2])
+  hp$geoAddress[i] <- as.character(result[3])
+}
+
+head(hp)
+
+```
+
+```{r}
+install.packages("tidygeocoder")
+library(tidygeocoder)
+```
+
+```{r}
+library(tidyg)
+dc_addresses <- tribble( ~name,~addr,
+"White House", "1600 Pennsylvania Ave Washington, DC",
+"National Academy of Sciences", "2101 Constitution Ave NW, Washington, DC 20418",
+"Department of Justice", "950 Pennsylvania Ave NW, Washington, DC 20530",
+"Supreme Court", "1 1st St NE, Washington, DC 20543",
+"Washington Monument", "2 15th St NW, Washington, DC 20024")
+
+coordinates <- dc_addresses %>%
+  geocode(addr)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+

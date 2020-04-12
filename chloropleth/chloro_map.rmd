@@ -14,6 +14,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 #install.packages('tidyverse')
 suppressWarnings(library(tidyverse))
+library(lubridate)
+library(magick)
 
 # Load in data
 hp <- read_csv('../data/PPR-ALL2.csv')
@@ -24,12 +26,67 @@ names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","d
 # Remove euro symbol from price values
 hp$price <- gsub('[\200]','', hp$price)
 hp$price <- gsub(',','', hp$price)
-hp$price <- gsub('\\.','', hp$price)
+#hp$price <- gsub('\\.','', hp$price)
 
 hp$price <- as.numeric(hp$price)
+#hp$sale_date <- as.POSIXlt(hp$sale_date)
+hp$sale_date<-dmy(hp$sale_date)
+hp$year<-year(hp$sale_date)
 
-# Convert to dplyr tibble
-hp <- as.tibble(hp)
+
+hp <- as_tibble(hp)
+
+filter1 <- hp %>% 
+  filter(grepl('^[0-9]+-[0-9]+', address)) %>%
+  mutate(estnum = abs(parse_number(str_match(address, '^*-[0-9]+'))) 
+                                - abs(parse_number(str_match(address, '^[0-9]+'))) +1 ) %>%
+  mutate(imputed_mean = price/estnum)
+filter1
+
+# Filter 2010 data and calculate means
+hp2010 <-
+  hp %>%
+  filter(year == 2010) %>%
+  group_by(county) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+# Filter 2020 data and calculate means
+hp2020 <-
+  hp %>%
+  filter(year == 2020) %>%
+  group_by(county) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+# Filter all data and calculate means
+hp_means <-
+  hp %>%
+  group_by(county, year) %>%
+  summarize(mean = mean(price, na.rm=TRUE))
+
+quantile(hp$mean, seq(0, 1, 0.1))
+
+price_levels <- c(60000, 120000, 180000, 240000, 300000,
+                360000, 420000, 480000, 540000, 600000)
+price_labels <- c('60k - 120k',   '120k - 180k', '180k - 240k', '240k - 300k',
+                '300k - 360k', '360k - 420k', '420k - 480k', '480k - 540k', '540k - 600k')
+
+colr <- colorRampPalette(c("white", "orange","red"))
+colors <- colr(9)
+names(colors) <- price_labels
+
+hp_means$`Mean price` <- factor(
+  cut(hp_means$mean, price_levels),
+  labels = price_labels
+)
+
+# Need to match country names with country names in .shp file
+hp_means$county = toupper(hp_means$county)
+
+hp2020 <-
+  hp_means %>%
+  filter(year == 2020) %>%
+  group_by(county) %>%
+  summarize(mean = mean, `Mean price` = `Mean price`)
 
 head(hp)
 ```
@@ -44,6 +101,7 @@ library(rgdal)
 library(ggmap)
 library(maptools)
 library(rgeos)
+library(mapproj)
 ire <- readOGR(dsn='../data', 
                layer='Counties__OSi_National_Statutory_Boundaries__Generalised_20m',
                stringsAsFactors = FALSE)
@@ -51,12 +109,41 @@ ire <- readOGR(dsn='../data',
 names(ire)
 
 
-counties <- fortify(ire, region = 'GUID')
+counties <- fortify(ire, region = 'COUNTY')
 
 #Basic plot prior to adding analysis
 ggplot() +
   geom_polygon(data = counties, aes( x = long, y = lat, group = group), fill="Forest Green", color="Black") +
   theme_void() 
 
+map_png <- function(year_var){
+  ire_map <- ggplot(hp_means %>% filter(year == year_var)) +
+  geom_map(aes(map_id=county, fill=`Mean price`), map=counties, color="Black") +
+  coord_map() +
+  expand_limits(x = counties$long, y = counties$lat) +
+  labs(title=paste('Mean house price by county for ', as.character(year_var), '', sep='')) +
+  scale_fill_manual(values = colors, drop=FALSE) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+  ggsave(paste('../png/ireland-choropleth-', year_var, '.png', sep=''), width = 4.5, height = 6, units = 'in', dpi=200, pointsize=14)
+}
 
+for (i in 2010:2020){
+  map_png(i)
+}
+
+```
+
+```{r}
+# Read the individual maps into a data structure for use with 'magick'
+imglayers <- sapply(c(2010:2020), function(yr) {
+  image_read(paste('../png/ireland-choropleth-', yr, '.png', sep=''))
+})
+
+# Generate an animated GIF with the individual maps and write to a file
+imganim <- image_animate(image_join(imglayers), fps = 1, dispose = "previous")
+image_write(imganim, '../gif/ireland-choropleth-anim.gif')
+
+imganim 
 ```

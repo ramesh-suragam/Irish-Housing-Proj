@@ -17,7 +17,7 @@ suppressMessages(library(lubridate))
 
 ## Load PPR dataset
 ```{r}
-hp <- read.csv("PPR-ALL.csv", header=F) 
+hp <- read.csv("../data/PPR-ALL.csv", header=F) 
 # header=F as wouldn't load otherwise due to euro symbol for price
 
 # Add column names
@@ -83,12 +83,52 @@ length(boxplot.stats(hp1$price_adj)$out)
 
 ## Multi-unit properites
 ```{r}
-# Remove properties which are >10 million as these are most likely multi-unit properties
-hp2 <- subset(hp1, price_adj <= 10000000)
 
 # There are issues with the multi-unit properties due to the fact that they are not consistently recorded within the dataset. Some are entered as a range, however others use text ('XXX apts' or 'apartments') or '&' etc. 
 
-# Fergal has worked on some code to address some of the issues arising from multi-unit properties and will add it here:
+# Used to insure counts are correct
+nrow(hp1)
+
+# Drop complex address groupings e.g. 1-2, 4-7 Greenlane Apts ;  
+complex_grouping <- hp1 %>%
+  filter(grepl('^[0-9]+-[0-9]+.*[0-9]+-[0-9]+', address))
+
+notable_exception <- hp1 %>% filter(grepl('^[0-9]+-[0-9]+.*[0-9]+\ -\ [0-9]+', address))
+
+hp1 <- anti_join(hp1, complex_grouping)
+hp1 <- anti_join(hp1, notable_exception)
+
+
+# Drop less than a million
+lessMil <- hp1 %>% filter(price_adj <= 1000000)%>%
+  filter(grepl('^[0-9]+-[0-9]+', address))
+
+hp1 <- anti_join(hp1, lessMil)
+
+# Filter properties over a million and impute mean
+filter1 <- hp1 %>%
+  filter(price >1000000) %>%
+  filter(grepl('^[0-9]+-[0-9]+', address)) %>%
+  mutate(estnum = abs(parse_number(str_match(address, '^*-[0-9]+'))) 
+                                - abs(parse_number(str_match(address, '^[0-9]+'))) +1 ) %>%
+  mutate(imputed_mean = price_adj/estnum)
+
+# Want to uncount addresses
+filter2 <- filter1 %>%
+  uncount(estnum) %>%
+  mutate(price_adj = imputed_mean)
+
+filter3 <- select(filter2,-c(imputed_mean))
+
+hp1 <- anti_join(hp1, filter1)
+hp1 <- full_join(hp1, filter3)
+
+
+# Remove properties which are >10 million as these are most likely multi-unit properties which do not conform to expected
+# naming criteria for multi-unit properties
+hp2 <- subset(hp1, price_adj <= 10000000)
+
+write.csv(hp2, "../data/PPR-ALL-CLEAN.csv") 
 
 
 ```

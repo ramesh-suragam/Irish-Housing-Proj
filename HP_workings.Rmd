@@ -3,8 +3,8 @@ title: "HP_workings"
 author: "Ramesh Suragam"
 date: "4/11/2020"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
+library(plotly)
 ```
 
 
@@ -75,107 +76,66 @@ names(hp2) <- c("Year","Desc","Price")
 
 p <- ggplot(data = hp2, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
-  theme(axis.text.x=element_text(angle=90, hjust=1))
-  
-p + labs(title="New Houses vs Second Hand Houses Price pattern",
+  theme(axis.text.x=element_text(angle=90, hjust=1))+ 
+  labs(title="New Houses vs Second Hand Houses Price pattern",
         x ="Year", y = "Median Prices of houses")
-  
+ggplotly(p)  
 ```
 
 ```{r}
-hp2 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county == 'dublin', select = c(year,desc,price_adj))
+hp3 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county == 'dublin', select = c(year,desc,price_adj))
 
-hp2 <- aggregate(hp2[, 3], list(hp2$year,hp2$desc), median)
-names(hp2) <- c("Year","Desc","Price")
+hp3 <- aggregate(hp3[, 3], list(hp3$year,hp3$desc), median)
+names(hp3) <- c("Year","Desc","Price")
 
-p <- ggplot(data = hp2, aes(x=Year, y=Price, color= Desc, group= Desc))+
+p2 <- ggplot(data = hp3, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
-  theme(axis.text.x=element_text(angle=90, hjust=1))
-  
-p + labs(title="New Houses vs Second Hand Houses Price pattern in Dublin",
+  theme(axis.text.x=element_text(angle=90, hjust=1))+
+  labs(title="New Houses vs Second Hand Houses Price pattern in Dublin",
         x ="Year", y = "Median Prices of houses")
 
-hp2 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county != 'dublin', select = c(year,desc,price_adj))
+ggplotly(p2)
 
-hp2 <- aggregate(hp2[, 3], list(hp2$year,hp2$desc), median)
-names(hp2) <- c("Year","Desc","Price")
+hp4 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county != 'dublin', select = c(year,desc,price_adj))
 
-p <- ggplot(data = hp2, aes(x=Year, y=Price, color= Desc, group= Desc))+
+hp4 <- aggregate(hp4[, 3], list(hp4$year,hp4$desc), median)
+names(hp4) <- c("Year","Desc","Price")
+
+p3 <- ggplot(data = hp4, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
-  theme(axis.text.x=element_text(angle=90, hjust=1))
-  
-p + labs(title="New Houses vs Second Hand Houses Price pattern Other Towns",
+  theme(axis.text.x=element_text(angle=90, hjust=1))+
+  labs(title="New Houses vs Second Hand Houses Price pattern Other Towns",
         x ="Year", y = "Median Prices of houses")
+
+
+ggplotly(p3)
 ```
 
 We see that there is an increasing trend of the new dwelling house/Apartment overall. When it comes to second hand dwelling houses we notice some differences.
 
 The second hand dwelling house/ Apartment prices for Dublin was always having an increasing trend across the years. However, we notice that after 2014 the price of second hand dwelling houses kept on increasing in the Dublin while the price shows a decreasing trend for other towns.
-```{r}
 
+```{r fig.height = 10, fig.width = 8}
+hp5 <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment', select = c(year,desc,price_adj, county))
+
+hp5 <- aggregate(hp5[, 3], list(hp5$year,hp5$desc, hp5$county), median)
+
+names(hp5) <- c("Year","Desc","County","Price")
+
+p4 <- ggplot(data = hp5, aes(x=Year, y=Price/1000, color= Desc, group= Desc))+
+  geom_line()+ 
+  labs(title="New Houses vs Second Hand Houses Price pattern Across counties",
+        x ="Year", y = "Median Prices of houses")+
+  theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")+
+  facet_wrap(~County)
+
+ggplotly(p4)
 ```
 
 ```{r}
+hp6 <- aggregate(hp$price_adj, by = list(hp$year, hp$county), max)
 
+names(hp6) <- c("Year","County","Max")
+
+hp6
 ```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-
-```{r}
-
-```
-

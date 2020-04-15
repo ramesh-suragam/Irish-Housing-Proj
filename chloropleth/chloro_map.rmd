@@ -36,12 +36,51 @@ hp$year<-year(hp$sale_date)
 
 hp <- as_tibble(hp)
 
-filter1 <- hp %>% 
+# Used to insure counts are correct
+nrow(hp)
+
+# Drop complex address groupings e.g. 1-2, 4-7 Greenlane Apts ;  
+complex_grouping <- hp %>%
+  filter(grepl('^[0-9]+-[0-9]+.*[0-9]+-[0-9]+', address))
+
+notable_exception <- hp %>% filter(grepl('^[0-9]+-[0-9]+.*[0-9]+\ -\ [0-9]+', address))
+
+hp <- anti_join(hp, complex_grouping)
+hp <- anti_join(hp, notable_exception)
+
+
+# Drop less than a million
+lessMil <- hp %>% filter(price <= 1000000)%>%
+  filter(grepl('^[0-9]+-[0-9]+', address))
+
+hp <- anti_join(hp, lessMil)
+
+# Filter properties over a million and impute mean
+filter1 <- hp %>%
+  filter(price >1000000) %>%
   filter(grepl('^[0-9]+-[0-9]+', address)) %>%
   mutate(estnum = abs(parse_number(str_match(address, '^*-[0-9]+'))) 
                                 - abs(parse_number(str_match(address, '^[0-9]+'))) +1 ) %>%
   mutate(imputed_mean = price/estnum)
-filter1
+
+# Want to uncount addresses
+filter2 <- filter1 %>%
+  uncount(estnum) %>%
+  mutate(price = imputed_mean)
+
+filter3 <- select(filter2,-c(imputed_mean))
+
+hp <- anti_join(hp, filter1)
+hp <- full_join(hp, filter3)
+
+# Used to insure counts are correct
+#nrow(filter2)
+
+# Test join
+#testout <- hp %>% filter(grepl('^[0-9]+-[0-9]+', address))
+
+#nrow(testout)
+#nrow(hp)
 
 # Filter 2010 data and calculate means
 hp2010 <-
@@ -120,15 +159,36 @@ ggplot() +
 
 map_png <- function(year_var){
   ire_map <- ggplot(hp_means %>% filter(year == year_var)) +
-  geom_map(aes(map_id=county, fill=`Mean price`), map=counties, color="Black") +
+  geom_map(aes(map_id=county, fill=`Mean price`), map=counties, color="grey") +
   coord_map() +
   expand_limits(x = counties$long, y = counties$lat) +
   labs(title=paste('Mean house price by county for ', as.character(year_var), '', sep='')) +
+  labs(x = "", y = "") +
   scale_fill_manual(values = colors, drop=FALSE) +
   theme_void() +
   theme(plot.title = element_text(hjust = 0.5))
   
-  ggsave(paste('../png/ireland-choropleth-', year_var, '.png', sep=''), width = 4.5, height = 6, units = 'in', dpi=200, pointsize=14)
+  # smithfield, Dundrum, Maynooth, Newbridge
+  Dub_labs <- data.frame(long = c(-6.27548, -6.2535892, -6.5996, -6.8324944), 
+                   lat = c(53.34780, 53.2873877, 53.3348943, 53.1798799), 
+                   names = c('Dublin', '', '', ''), stringsAsFactors = FALSE)
+  
+  Lim_labs <- data.frame(long = c(-8.7001795, -8.7269407, -8.5637677, -9.3058371), 
+                   lat = c(52.6514944, 52.5189556, 52.6731696, 52.3861802), 
+                   names = c('Limerick', '', '', ''), stringsAsFactors = FALSE)
+  
+  costal_labs <- data.frame(long = c(-9.5270998, -8.1235273), 
+                   lat = c(53.8001097, 54.6521189), 
+                   names = c('', ''), stringsAsFactors = FALSE)
+  
+  ire_map + 
+    geom_point(data = Dub_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = Dub_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.5, hjust = "center"), size = 2.2) +
+    geom_point(data = Lim_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = Lim_labs, mapping=aes(x=long, y=lat, label=names, vjust = "top", hjust = "left"), size = 2.2) +
+    geom_point(data = costal_labs, mapping=aes(x=long, y=lat),color = 'green', alpha=0.5, size = 1) 
+  
+  ggsave(paste('../png/ireland-choropleth-', year_var, '.png', sep=''), width = 4.5, height = 6, units = 'in', dpi=300, pointsize=14)
 }
 
 for (i in 2010:2020){

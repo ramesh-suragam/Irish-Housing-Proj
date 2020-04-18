@@ -18,7 +18,7 @@ library(lubridate)
 library(magick)
 
 # Load in data
-hp <- read.csv('../data/PPR-ALL.csv')
+hp <- read_csv('../data/PPR-ALL2.csv')
 
 # Give dataset more code friendly header
 names(hp) <- c("sale_date","address","post_code","county","price","nfmp","vx","desc","size_desc")
@@ -128,8 +128,6 @@ hp2020 <-
   summarize(mean = mean, `Mean price` = `Mean price`)
 
 head(hp)
-
-
 ```
 
 Next we will source and load in the shape file that we will use in our chloropleth map. The data.gov.ie website has a resource published ny the Ordnance Survey Ireland group which divides Ireland into individual counties.

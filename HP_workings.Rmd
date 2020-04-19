@@ -34,8 +34,14 @@ names(hp) <- c("sale_date","address","county","price","nfmp","vx","desc","year",
 #Removing the extra header
 hp<-hp[-1, ]
 
+#Removing rows that contained a small amount of Irish language descriptions of properties
+hp <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment')
+
 head(hp)
-# head(hp)
+
+hp_count <- count(hp,county)
+hp_count <- hp_count[order(-hp_count$n),]
+hp_count
 ```
 
 ```{r}
@@ -49,7 +55,7 @@ hp$sale_date  <- as.Date(hp$sale_date)
 hp$price      <- as.numeric(as.character(hp$price))
 hp$price_adj  <- as.numeric(as.character(hp$price_adj))
 
-# head(hp)
+head(hp)
 ```
 
 ```{r}
@@ -78,108 +84,173 @@ hp$price_adj  <- as.numeric(as.character(hp$price_adj))
 ```
 
 ```{r}
-hp2 <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment', select = c(year,desc,price_adj))
+#hp2 <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment', select = c(year,desc,price_adj))
+hp2 <- subset(hp, select = c(year,desc,price_adj))
 
 hp2 <- aggregate(hp2[, 3], list(hp2$year,hp2$desc), median)
 names(hp2) <- c("Year","Desc","Price")
 
-p <- ggplot(data = hp2, aes(x=Year, y=Price, color= Desc, group= Desc))+
+p2 <- ggplot(data = hp2, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
   theme(axis.text.x=element_text(angle=90, hjust=1))+ 
   labs(title="New Houses vs Second Hand Houses Price pattern",
         x ="Year", y = "Median Prices of houses")
-ggplotly(p)  
+ggplotly(p2)  
 
 ```
 
 ```{r}
-hp3 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county == 'dublin', select = c(year,desc,price_adj))
+#hp3 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county == 'dublin', select = c(year,desc,price_adj))
+hp3 <- subset(hp, county == 'dublin', select = c(year,desc,price_adj))
 
 hp3 <- aggregate(hp3[, 3], list(hp3$year,hp3$desc), median)
 names(hp3) <- c("Year","Desc","Price")
 
-p2 <- ggplot(data = hp3, aes(x=Year, y=Price, color= Desc, group= Desc))+
+p3 <- ggplot(data = hp3, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
   theme(axis.text.x=element_text(angle=90, hjust=1))+
   labs(title="New Houses vs Second Hand Houses Price pattern in Dublin",
         x ="Year", y = "Median Prices of houses")
 
-ggplotly(p2)
+ggplotly(p3)
 
-hp4 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county != 'dublin', select = c(year,desc,price_adj))
+# hp4 <- subset(hp, (desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment') & county != 'dublin', select = c(year,desc,price_adj))
+hp4 <- subset(hp, county != 'dublin', select = c(year,desc,price_adj))
 
 hp4 <- aggregate(hp4[, 3], list(hp4$year,hp4$desc), median)
 names(hp4) <- c("Year","Desc","Price")
 
-p3 <- ggplot(data = hp4, aes(x=Year, y=Price, color= Desc, group= Desc))+
+p4 <- ggplot(data = hp4, aes(x=Year, y=Price, color= Desc, group= Desc))+
   geom_line()+  geom_point()+ 
   theme(axis.text.x=element_text(angle=90, hjust=1))+
   labs(title="New Houses vs Second Hand Houses Price pattern Other Towns",
         x ="Year", y = "Median Prices of houses")
 
 
-ggplotly(p3)
+ggplotly(p4)
 ```
 
 
 ```{r fig.height = 10, fig.width = 8}
-hp5 <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment', select = c(year,desc,price_adj, county))
+# hp5 <- subset(hp, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment', select = c(year,desc,price_adj, county))
+hp5 <- subset(hp, select = c(year,desc,price_adj, county))
 
 hp5 <- aggregate(hp5[, 3], list(hp5$year,hp5$desc, hp5$county), median)
 
 names(hp5) <- c("Year","Desc","County","Price")
 
-p4 <- ggplot(data = hp5, aes(x=Year, y=Price/1000, color= Desc, group= Desc))+
+p5 <- ggplot(data = hp5, aes(x=Year, y=Price/1000, color= Desc, group= Desc))+
   geom_line()+ 
   labs(title="New Houses vs Second Hand Houses Price pattern Across counties",
         x ="Year", y = "Median Prices of houses")+
   theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")+
   facet_wrap(~County)
 
-p4
-#ggplotly(p4)
+p5
+#ggplotly(p5)
 ```
 
 ```{r}
-hp6 <- hp %>% filter(desc == 'New Dwelling house /Apartment') %>% group_by(county,desc) %>% summarise(n=length(county),median_price=median(price_adj))
+#Finding the Most Expensive and Cheapest New House properties in each county per year
+#hp6 <- aggregate(hp$price_adj, by = list(hp$county), max)
 
-hp6 %>% ggplot(mapping=aes(x=median_price, y=n)) + geom_point(aes(size=n))+
+hp6 <- hp %>% filter(desc == 'New Dwelling house /Apartment') %>% group_by(county) %>% summarise(max(price_adj))
+
+hp7 <- hp %>% filter(desc == 'New Dwelling house /Apartment') %>% group_by(county) %>% summarise(min(price_adj))
+
+names(hp6) <- c("County","Price")
+names(hp7) <- c("County","Price")
+
+#head(hp6)
+#head(hp7)
+
+p6 <- ggplot(data = hp6, aes(x=County, y=Price/1000000, color= County, group= County))+
+  geom_bar(stat = "identity")+
+  labs(title="Most expensive New house properties in each county",
+        x ="County", y = "House Price in Million")+
+  theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")
+
+p7 <- ggplot(data = hp7, aes(x=County, y=Price, color= County, group= County))+
+  geom_bar(stat = "identity")+
+  labs(title="Cheapest New house properties in each county",
+        x ="County", y = "House Price")+
+  theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")
+
+# p6
+# p7
+
+ggplotly(p6)
+ggplotly(p7)
+```
+
+```{r}
+#Finding the Most Expensive and Cheapest Second-Hand House properties in each county per year
+#hp6 <- aggregate(hp$price_adj, by = list(hp$county), max)
+
+hp8 <- hp %>% filter(desc == 'Second-Hand Dwelling house /Apartment') %>% group_by(county) %>% summarise(max(price_adj))
+
+hp9 <- hp %>% filter(desc == 'Second-Hand Dwelling house /Apartment') %>% group_by(county) %>% summarise(min(price_adj))
+
+names(hp8) <- c("County","Price")
+names(hp9) <- c("County","Price")
+
+#head(hp8)
+#head(hp9)
+
+p8 <- ggplot(data = hp8, aes(x=County, y=Price/1000000, color= County, group= County))+
+  geom_bar(stat = "identity")+
+  labs(title="Most expensive Second-Hand house properties in each county",
+        x ="County", y = "House Price in Million")+
+  theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")
+
+p9 <- ggplot(data = hp9, aes(x=County, y=Price, color= County, group= County))+
+  geom_bar(stat = "identity")+
+  labs(title="Cheapest Second-Hand house properties in each county",
+        x ="County", y = "House Price")+
+  theme(axis.text.x=element_text(angle=90, hjust=1), legend.position="none")
+
+# p8
+# p9
+
+ggplotly(p8)
+ggplotly(p9)
+```
+
+```{r}
+# Number of Sales vs Median Price
+hp10 <- hp %>% filter(desc == 'New Dwelling house /Apartment') %>% group_by(county,desc) %>% summarise(n=length(county),median_price=median(price_adj))
+
+hp10 %>% ggplot(mapping=aes(x=median_price, y=n)) + geom_point(aes(size=n))+
   geom_text(data = filter(hp6, n >5000),aes(label=county),hjust = 0.5, nudge_x = 0.5,vjust = -0.7, nudge_y = 0.5)+
-  labs(title="Average Price vs Number of Sales for New Homes",
-        x ="Average Price", y = "Number of Sales")
+  labs(title="Median Price vs Number of Sales for New Homes",
+        x ="Median Price", y = "Number of Sales")
 
-hp7 <- hp %>% filter(desc == 'Second-Hand Dwelling house /Apartment') %>% group_by(county,desc) %>% summarise(n=length(county),median_price=median(price_adj))
+hp11 <- hp %>% filter(desc == 'Second-Hand Dwelling house /Apartment') %>% group_by(county,desc) %>% summarise(n=length(county),median_price=median(price_adj))
 
-hp7 %>% ggplot(mapping=aes(x=median_price, y=n)) + geom_point(aes(size=n))+
+hp11 %>% ggplot(mapping=aes(x=median_price, y=n)) + geom_point(aes(size=n))+
   geom_text(data = filter(hp7, n >18000),aes(label=county),hjust = 0.5, nudge_x = 0.5,vjust = -0.7, nudge_y = 0.5)+
-  labs(title="Average Price vs Number of Sales for Second-Hand Homes",
-        x ="Average Price", y = "Number of Sales")
+  labs(title="Median Price vs Number of Sales for Second-Hand Homes",
+        x ="Median Price", y = "Number of Sales")
 ```
 
-```{r}
-# #Finding Costliest properties in each county per year
-hp6 <- aggregate(hp$price_adj, by = list(hp$county, hp$year), max)
-
-names(hp6) <- c("Year","County","Max")
-
-head(hp6)
-```
-
-```{r}
-# #Findng Cheapest properties in each county per year
-min(hp$price)
-
-hp7 <- aggregate(hp$price_adj, by = list(hp$county,hp$year), min)
-
-names(hp7) <- c("Year","County","Min")
-
-head(hp7)
-```
 
 ```{r}
 #Time series plot for new homes
+
 ```
 
 ```{r}
 #Time series plot for second-hand homes
+```
+
+```{r}
+#countryside vs city
+```
+
+```{r}
+#countryside vs city
+```
+
+```{r}
+#try to convert to towns
 ```

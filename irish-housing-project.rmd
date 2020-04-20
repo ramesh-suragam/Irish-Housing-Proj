@@ -29,7 +29,7 @@ knitr::include_graphics('./gif/ireland-choropleth-anim.gif')
 
 In general property prices appear to be increasing and further detail will be given in the following sections
 
-## Data Clensing
+## Data Cleansing
 
 
 

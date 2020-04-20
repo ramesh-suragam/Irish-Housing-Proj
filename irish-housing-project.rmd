@@ -1,6 +1,6 @@
 ---
 title: "Irish Property Pricing Project"
-author: "Fergal Stapleton, Fiona Devaney, Colin Brian O'Flynn, Ramesh Suragam, Vishal Walia and John Dunne"
+author: "Fergal Stapleton, Amit Anchalia, Fiona Devaney, Colin Brian O'Flynn, Ramesh Suragam, Vishal Walia and John Dunne"
 date: "4/20/2020"
 output: html_document
 ---

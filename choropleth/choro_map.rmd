@@ -151,7 +151,7 @@ for (i in 2010:2019){
 
 ```{r}
 # Read the individual maps into a data structure for use with 'magick'
-imglayers <- sapply(c(2010:2020), function(yr) {
+imglayers <- sapply(c(2010:2019), function(yr) {
   image_read(paste('../png/ireland-choropleth-', yr, '.png', sep=''))
 })
 

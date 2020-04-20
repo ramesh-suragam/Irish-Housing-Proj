@@ -17,19 +17,23 @@ The objective of this project is to analyse of the housing market in Ireland fro
 
 The global economic crash of 2008 had a profound effect on the housing market in Ireland.[2] Ireland was severly hit becomming the first european country to offically enter recession status in september of 2008 and which lasted well into 2013 and which effectively brought to an end to what is colloquially refered to as the 'Celtic Tiger', a period of economic growth that originated in the early 1990's.
 
-One of the primary reasons the economy was so deeply effected was due to a property bubble which arose due to poor financial regulatory practices relating to lending and mortage policies by banks.[3]
-
-To aid in our overview a Choropleth animation was created using data from the Ordinance Survey Ireland group.[4] The chloropleth animation shows the median property prices for each county for each year ranging from 2010 to 2019 (Fig. 1). A property in this context can mostly be defined as either an apartment or a house (see Data Cleansing section for detail). Pricing was ajusted for VAT. Starting in 2010 we can see a continued decline in median property prices country wide up until 2013. At this point property prices for 11 counties had a median price of 90K or less. After 2013 propety prices in general begin to recover increasing year on year for most counties. A point of note is Dublin which has the greatest increase in median price and from 2017 on the surrounding counties of Meath, Kildare and Wicklow had median prices above 210K. By the end of 2019 Galway and Cork also went above the median price of 210K.
-
-```{r, out.width = "300px"}
+```{r fig.width= 6, fig.height= 3, out.width= "50%", out.extra='style="float:right; padding:10px"', echo=FALSE}
 knitr::include_graphics('./gif/ireland-choropleth-anim.gif')
 ```
+
+
+One of the primary reasons the economy was so deeply effected was due to a property bubble which arose due to poor financial regulatory practices relating to lending and mortage policies by banks.[3]
+
+
+To aid in our overview a Choropleth animation was created using data from the Ordinance Survey Ireland group.[4] The chloropleth animation shows the median property prices for each county for each year ranging from 2010 to 2019 (Fig. 1). A property in this context can mostly be defined as either an apartment or a house (see Data Cleansing section for detail). Pricing was ajusted for VAT. Starting in 2010 we can see a continued decline in median property prices country wide up until 2013. At this point property prices for 11 counties had a median price of 90K or less. After 2013 propety prices in general begin to recover increasing year on year for most counties. A point of note is Dublin which has the greatest increase in median price and from 2017 on the surrounding counties of Meath, Kildare and Wicklow had median prices above 210K. By the end of 2019 Galway and Cork also went above the median price of 210K.
 
 
 
 In general property prices appear to be increasing and further detail will be given in the following sections
 
-## Data Cleansing
+
+
+### Data Cleansing
 
 
 

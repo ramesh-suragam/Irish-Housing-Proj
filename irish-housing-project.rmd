@@ -1,0 +1,47 @@
+---
+title: "Irish Property Pricing Project"
+author: "Fergal Stapleton, Amit Anchalia, Fiona Devaney, Colin Brian O'Flynn, Ramesh Suragam, Vishal Walia and John Dunne"
+date: "4/20/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Abstract
+
+The objective of this project is to analyse of the housing market in Ireland from 2010 to 2019 with strong visualisations to support our analysis. We will also offer some prediction for 2020 through to 2022. In addtion we will conduct a more granular study of commuter and costal towns offering analysis of trends relating to this data. In the next section we will provide a general overview starting with a brief discussion about the recession, its effects and the aftermath.
+
+### Overview
+
+The global economic crash of 2008 had a profound effect on the housing market in Ireland.[2] Ireland was severly hit becomming the first european country to offically enter recession status in september of 2008 and which lasted well into 2013 and which effectively brought to an end to what is colloquially refered to as the 'Celtic Tiger', a period of economic growth that originated in the early 1990's.
+
+```{r fig.width= 6, fig.height= 3, out.width= "50%", out.extra='style="float:right; padding:10px"', echo=FALSE}
+knitr::include_graphics('./gif/ireland-choropleth-anim.gif')
+```
+
+
+One of the primary reasons the economy was so deeply effected was due to a property bubble which arose due to poor financial regulatory practices relating to lending and mortage policies by banks.[3]
+
+
+To aid in our overview a Choropleth animation was created using data from the Ordinance Survey Ireland group.[4] The chloropleth animation shows the median property prices for each county for each year ranging from 2010 to 2019 (Fig. 1). A property in this context can mostly be defined as either an apartment or a house (see Data Cleansing section for detail). Pricing was ajusted for VAT. Starting in 2010 we can see a continued decline in median property prices country wide up until 2013. At this point property prices for 11 counties had a median price of 90K or less. After 2013 propety prices in general begin to recover increasing year on year for most counties. A point of note is Dublin which has the greatest increase in median price and from 2017 on the surrounding counties of Meath, Kildare and Wicklow had median prices above 210K. By the end of 2019 Galway and Cork also went above the median price of 210K.
+
+
+
+In general property prices appear to be increasing and further detail will be given in the following sections
+
+
+
+### Data Cleansing
+
+
+
+
+
+### References
+
+[1] <primary-data-source> \
+[2] https://en.wikipedia.org/wiki/Post-2008_Irish_economic_downturn \
+[3] https://en.wikipedia.org/wiki/Celtic_Tiger \
+[4] https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6

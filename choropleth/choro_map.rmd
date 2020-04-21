@@ -1,0 +1,163 @@
+---
+title: "data_exploration.rmd"
+author: "Fergal Stapleton"
+date: "03/04/2020"
+output: html_document
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Choropleth Map
+
+```{r}
+#install.packages('tidyverse')
+suppressWarnings(library(tidyverse))
+library(lubridate)
+library(magick)
+
+# Load in data
+hp <- read_csv('../data/PPR-ALL-CLEAN.csv')
+hp <- hp[,-1] 
+
+# Give dataset more code friendly header
+names(hp) <- c("sale_date","address","county","price","nfmp","vx","desc","year","price_adj")
+
+hp <- as_tibble(hp)
+
+
+# Filter 2010 data and calculate means
+hp2010 <-
+  hp %>%
+  filter(year == 2010) %>%
+  group_by(county) %>%
+  summarize(median = median(price_adj, na.rm=TRUE))
+
+# Filter 2020 data and calculate means
+hp2020 <-
+  hp %>%
+  filter(year == 2015) %>%
+  group_by(county) %>%
+  summarize(median = median(price_adj, na.rm=TRUE))
+
+# Filter all data and calculate means
+hp_median <-
+  hp %>%
+  group_by(county, year) %>%
+  summarize(median = median(price_adj, na.rm=TRUE))
+
+quantile(hp$median, seq(0, 1, 0.1))
+
+price_levels <- c(50000, 90000, 130000, 170000, 210000, 250000,
+                290000, 330000, 370000)
+price_labels <- c('50 - 90k', '90k  - 130k',   '130k - 170k', '170k - 210k', '210k - 250k',
+                '250k - 290k', '290K - 330k', '330k - 370k')
+
+colr <- colorRampPalette(c("white", "orange","red"))
+colors <- colr(8)
+names(colors) <- price_labels
+
+hp_median$`median price` <- factor(
+  cut(hp_median$median, price_levels),
+  labels = price_labels
+)
+
+# Need to match country names with country names in .shp file
+hp_median$county = toupper(hp_median$county)
+
+hp2020 <-
+  hp_median %>%
+  filter(year == 2020) %>%
+  group_by(county) %>%
+  summarize(median = median, `median price` = `median price`)
+
+head(hp)
+```
+
+Next we will source and load in the shape file that we will use in our chloropleth map. The data.gov.ie website has a resource published ny the Ordnance Survey Ireland group which divides Ireland into individual counties.
+
+Source for counties shape file:
+https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6
+
+```{r}
+library(rgdal)
+library(ggmap)
+library(maptools)
+library(rgeos)
+library(mapproj)
+ire <- readOGR(dsn='../data', 
+               layer='Counties__OSi_National_Statutory_Boundaries__Generalised_20m',
+               stringsAsFactors = FALSE)
+
+names(ire)
+
+
+counties <- fortify(ire, region = 'COUNTY')
+
+#Basic plot prior to adding analysis
+ggplot() +
+  geom_polygon(data = counties, aes( x = long, y = lat, group = group), fill="Forest Green", color="Black") +
+  theme_void() 
+
+map_png <- function(year_var){
+  ire_map <- ggplot(hp_median %>% filter(year == year_var)) +
+  geom_map(aes(map_id=county, fill=`median price`), map=counties, color="grey") +
+  coord_map() +
+  expand_limits(x = counties$long, y = counties$lat) +
+  labs(title=paste('Median property price by county for ', as.character(year_var), '', sep='')) +
+  labs(x = "", y = "") +
+  scale_fill_manual(values = colors, drop=FALSE) +
+  theme_void() +
+  theme(plot.title = element_text(hjust = 1))
+  
+  # Dublin, Limerick, Cork and Galway long an lat coordinates
+  Dub_labs <- data.frame(long = c(-6.27548), 
+                   lat = c(53.34780), 
+                   names = c('Dublin'), stringsAsFactors = FALSE)
+  
+  Lim_labs <- data.frame(long = c(-8.7001795), 
+                   lat = c(52.6514944), 
+                   names = c('Limerick'), stringsAsFactors = FALSE)
+  
+  cork_labs <- data.frame(long = c(-8.5330895), 
+                   lat = c(51.8959843), 
+                   names = c('Cork'), stringsAsFactors = FALSE)
+    
+  galway_labs <- data.frame(long = c(-9.118786), 
+                   lat = c(53.283891), 
+                   names = c('Galway'), stringsAsFactors = FALSE)
+  
+
+  
+  ire_map + 
+    geom_point(data = Dub_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = Dub_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.5, hjust = "right"), size = 3) +
+    geom_point(data = Lim_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = Lim_labs, mapping=aes(x=long, y=lat, label=names, vjust = "top", hjust = "left"), size = 3) +
+    geom_point(data = cork_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = cork_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.5, hjust = "center"), size = 3) +
+    geom_point(data = galway_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
+    geom_text(data = galway_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.5, hjust = "center"), size = 3) +
+  
+  ggsave(paste('../png/ireland-choropleth-', year_var, '.png', sep=''), width = 4.5, height = 6, units = 'in', dpi=300, pointsize=14)
+}
+
+for (i in 2010:2019){
+  map_png(i)
+}
+
+```
+
+```{r}
+# Read the individual maps into a data structure for use with 'magick'
+imglayers <- sapply(c(2010:2019), function(yr) {
+  image_read(paste('../png/ireland-choropleth-', yr, '.png', sep=''))
+})
+
+# Generate an animated GIF with the individual maps and write to a file
+imganim <- image_animate(image_join(imglayers), fps = 1, dispose = "previous")
+image_write(imganim, '../gif/ireland-choropleth-anim.gif')
+
+imganim 
+```

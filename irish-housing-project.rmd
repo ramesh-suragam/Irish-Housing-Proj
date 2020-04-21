@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Abstract
 
-The objective of this project is to analyse of the housing market in Ireland from 2010 to 2019 with strong visualisations to support our analysis. We will also offer some prediction for 2020 through to 2022. In addtion we will conduct a more granular study of commuter and costal towns offering analysis of trends relating to this data. In the next section we will provide a general overview starting with a brief discussion about the recession, its effects and the aftermath.
+The objective of this project is to analyse the housing market in Ireland from 2010 to 2019 with strong visualisations to support our analysis. We will also offer some prediction for 2020 through to 2022. In addtion we will conduct a more granular study of commuter and costal towns offering analysis of trends relating to this data. In the next section we will provide a general overview starting with a brief discussion about the recession, its effects and the aftermath.
 
 ### Overview
 
@@ -35,6 +35,96 @@ In general property prices appear to be increasing and further detail will be gi
 
 ### Data Cleansing
 
+### Analysis of Dublin Commuter Belt
+
+The Dublin commuter belt was originally an area of land beyond the M50 motorway where people who worked in the city would buy homes which were more affordable than the properties in the inner city. The Dublin commuter belt initially comprised towns such as Lucan and Swords. However, since the height of the housing bubble in the early 2000’s the Dublin commuter belt began to spread into the adjoining counties of Kildare and Meath until it’s halt was eventually precipitated by the 2008 housing collapse. The heat map below shows the median house and apartment prices in the period from 2010 to 2019 in the counties of Kildare and Meath. The heat map is illustrative of the sharp fall in property prices that was witnessed in the years from 2011 until 2013 followed by a resurgence in property prices from mid 2014 onwards. Property prices grew strongly from 2014 where the median price was €193,000 until the end of 2019 where the median price had risen to €268,722 in the Kildare, Meath areas.[5] 
+
+```{r echo=FALSE}
+suppressMessages(library(tidyverse))
+suppressMessages(library(ggplot2))
+suppressMessages(library(plyr))
+suppressMessages(library(GGally))
+# Read in Data
+country_data <- read.csv("data/PPR-ALL-CLEAN.csv")
+kildare_data <- country_data[country_data$county == "kildare",]
+meath_data <- country_data[country_data$county == "meath",]
+house_clean <- rbind(kildare_data, meath_data)
+house_clean <- house_clean[,-1]
+
+names(house_clean) <- c("Date","Address","County","Price","Not Full Price","VAT Exclusive","Description","Year","Price_adj")
+dates_orginal <- house_clean[,1]
+dates_orginal <- strptime(as.character(dates_orginal), "%Y-%m-%d")
+dates_orginal <- format(dates_orginal, "%d/%m/%Y")
+house_clean[,1] <- as.character(house_clean[,1])
+
+date_long <- substring(house_clean[,1],str_length(house_clean[,1])-9)
+
+my_month <- as.numeric(substring( date_long,6, 7))
+
+dayf <- as.numeric(substring(date_long,9, 10))
+
+my_months <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+
+# Drop Postal Code
+house_clean <- house_clean[,1:8]
+house_clean <- house_clean[,c(1:2,4:8)]
+
+
+house_clean <- mutate(house_clean,
+                      monthf = my_months[my_month],
+                      weekdayf = substring(weekdays(as.Date(dates_orginal, "%d/%m/%Y")),1,3),
+                      monthweek =  1 + 
+                      ceiling(as.numeric(difftime(as.Date(dates_orginal, "%d/%m/%Y"), 
+                              as.Date(paste0(substr(as.Date(dates_orginal, "%d/%m/%Y"),1,8),'01')), units = "weeks")))
+                              , week= monthweek
+                      )
+
+house_clean <- mutate(house_clean,
+                      full_date = dates_orginal
+                      )
+
+house_clean <- house_clean[house_clean$Date < 2020,]
+house_clean <- house_clean[house_clean$Price > 60000,]
+house_clean <- house_clean[house_clean$Price < 1500000,]
+median_prices <- ddply(house_clean, .(full_date), summarize, mean_Price_for_day = round(median(Price)/1000,0))
+
+median_prices <- mutate(median_prices,
+                        monthf = substring(months(as.Date(median_prices$full_date)),1,3),
+                        weekdayf = substring(weekdays(as.Date(median_prices$full_date)),1,3),
+                        monthweek =  1 + 
+                        ceiling(as.numeric(difftime(as.Date(median_prices$full_date, "%d/%m/%Y"), 
+                                as.Date(paste0(substr(as.Date(median_prices$full_date, "%d/%m/%Y"),1,8),'01')), units = "weeks")))
+                        , week= monthweek,
+                        Date = substring(as.character(median_prices$full_date),str_length(median_prices$full_date)- 3 )
+                 
+                        )
+median_prices <- median_prices[(median_prices[,2] < 450) & (median_prices[,2] > 60) ,]
+
+
+median_prices$monthf <- factor(median_prices$monthf,labels=c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"), ordered= T)
+
+
+
+```
+
+```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE}
+ # Heat Map of Kildare and Meath house prices
+ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) + 
+  geom_tile(colour = "white") + 
+  facet_grid(Date~monthf ) + 
+  scale_fill_gradient(low="yellow", high="red") +
+  labs(x="Week of Month",
+       y="",
+       title = "Calendar Heatmap of Median Prices From 2010-2019", 
+       subtitle="Commuter Belt - Kildare, Meath", 
+       fill="Prices")+
+  theme(
+        #axis.text.y=element_blank(),
+        #axis.ticks.y=element_blank(),
+        axis.text.y = element_text(size=4.0)
+        ) 
+
+```
 
 
 
@@ -44,4 +134,5 @@ In general property prices appear to be increasing and further detail will be gi
 [1] <primary-data-source> \
 [2] https://en.wikipedia.org/wiki/Post-2008_Irish_economic_downturn \
 [3] https://en.wikipedia.org/wiki/Celtic_Tiger \
-[4] https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6
+[4] https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6 \
+[5] https://www.irishtimes.com/business/economy/priced-out-home-buyers-drifting-to-dublin-s-commuter-belt-1.4104686

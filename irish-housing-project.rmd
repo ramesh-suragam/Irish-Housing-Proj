@@ -5,6 +5,14 @@ date: "4/20/2020"
 output: html_document
 ---
 
+<!-- Code to justify the text and set the font size --> 
+<style>
+body {
+text-align: justify;
+<!-- font-size: 10pt; --> 
+}
+</style>
+
 ```{r setup, include=FALSE, echo=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
@@ -51,7 +59,7 @@ Before data analysis commenced, the dataset was read-in and examined, and from t
 ## Load PPR dataset
 
 #hp <- read.csv("../data/PPR-ALL.csv", header=F) 
-hp <- read.csv("PPR-ALL.csv", header=F) 
+hp <- read.csv("data/PPR-ALL.csv", header=F) 
 # header=F as wouldn't load otherwise due to euro symbol for price
 
 # Add column names
@@ -526,8 +534,136 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
 
 ```
 
+```{r}
+#Loading libraries
+suppressMessages(library(dplyr))
+suppressMessages(library(tidyverse))
+suppressMessages(library(ggplot2))
+suppressMessages(library(plotly))
+suppressMessages(library(dygraphs))
+suppressMessages(library(xts))
+```
 
+```{r}
+#Loading Data
 
+#Reading the data, Excluding the header since the euro sign is creating a error loading the data because of the encoding issues.
+# hp <- read.csv("data/PPR-ALL-CLEAN.csv", header = FALSE)
+
+#Using the already loaded clean data
+hp4 <- hp_clean
+
+#Using the already loaded clean data and removing the index column
+hp4 <- hp4[,-1]
+
+#Setting the header values: commenting since already set before
+#names(hp4) <- c("sale_date","address","county","price","nfmp","vx","desc","year","price_adj")
+
+#Removing the extra header: commenting since already accomplished above
+# hp4<-hp4[-1, ]
+
+#Removing rows that contained a small amount of Irish language descriptions of properties
+hp4 <- subset(hp4, desc=='New Dwelling house /Apartment' | desc=='Second-Hand Dwelling house /Apartment')
+
+# head(hp4)
+# hp_count <- count(hp4,county)
+# hp_count <- hp_count[order(-hp_count$n),]
+# hp_count
+
+#Data Cleaning
+
+#Commenting since task completed above
+#hp4$address    <- as.character(hp4$address)
+#hp4$county     <- as.factor(hp4$county)
+#hp4$nfmp       <- as.factor(hp4$nfmp)
+#hp4$vx         <- as.factor(hp4$vx)
+#hp4$sale_date  <- as.Date(hp4$sale_date)
+# hp4$price      <- as.numeric(as.character(hp4$price))
+# hp4$price_adj  <- as.numeric(as.character(hp4$price_adj))
+
+#Converting sale_date to year quarter format
+hp4$sale_date <- as.yearqtr(hp4$sale_date, format = "%Y-%m-%d")
+
+# head(hp)
+```
+
+### Comparision of New properties vs Second-hand properties
+
+```{r}
+#Subsetting only dublin towns with New and Second house /Apartment information
+hp5 <- subset(hp4, county == 'dublin')
+
+hp5 <- aggregate(hp5[, 9], list(hp5$desc,hp5$sale_date), median)
+names(hp5) <- c("desc","sale_date","count")
+
+# hp5 <- hp5 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
+
+hp5 <- spread(hp5, desc, count) 
+
+hp5_ts <-xts(x = hp5, order.by = hp5$sale_date)
+
+hp5_dub_dyg <- dygraph(hp5_ts, width = 400, height = 300, group = "nh_sh", main = "Dublin New vs Second-Hand Houses/Apartments") %>% 
+  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
+  dyRangeSelector() %>%
+  dyCrosshair(direction = "vertical") %>%
+  dyHighlight(highlightCircleSize = 4, 
+              highlightSeriesBackgroundAlpha = 0.5,
+              hideOnMouseOut = TRUE)%>%
+  dyLegend(show = "follow")%>%
+  dyShading(from="2012-6-15", to="2013-12-15", color="#F7CED7FF") %>%
+  dyShading(from="2019-4-15", to="2020-1-15", color="#CBFFCB")
+
+#Subsetting other towns with New and Second house /Apartment information
+hp6 <- subset(hp4, county != 'dublin')
+
+hp6 <- aggregate(hp6[, 9], list(hp6$desc,hp6$sale_date), median)
+names(hp6) <- c("desc","sale_date","count")
+
+# hp6 <- hp6 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
+
+hp6 <- spread(hp6, desc, count) 
+
+hp6_ts <-xts(x = hp6, order.by = hp6$sale_date)
+
+hp6_oth_dyg <- dygraph(hp6_ts, width = 400, height = 300, group = "nh_sh", main = "Other Towns New vs Second-Hand Houses/Apartments") %>% 
+  dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
+  dyRangeSelector() %>%
+  dyCrosshair(direction = "vertical") %>%
+  dyHighlight(highlightCircleSize = 4, 
+              highlightSeriesBackgroundAlpha = 0.5,
+              hideOnMouseOut = TRUE)%>%
+  dyLegend(show = "follow")%>%
+  dyShading(from="2013-1-15", to="2014-6-15", color="#F7CED7FF")%>%
+  dyShading(from="2019-4-15", to="2020-1-15", color="#CBFFCB")
+
+# hp5_dub_dyg
+# hp6_oth_dyg
+
+dy_graph <- list(
+  hp5_dub_dyg,hp6_oth_dyg
+)  # end list
+
+#htmltools::browsable(htmltools::tagList(dy_graph))
+# htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid; background-color:#e9e9e9; display:inline-block;")
+```
+
+<div style="float:right;padding:0 0 0 20px">
+```{r, fig.cap = c("Interactive plot for comparision between New and Second-hand properties")}
+htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid; background-color:#e9e9e9; display:inline-block;")
+```
+</div>
+
+When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in Dublin towns or other towns. The below interactive plot helps us in making this decision by understanding the trends across the last ten years.
+
+The time-period between Q3 2012 and Q1 2014 marked in red in plot 1 is the lowest point of prices for both new and second-hand properties for the dublin towns. One the other hand, the time-period between Q1 2013 and Q2 2014 marked in red in plot 2 is the lowest point of the prices for both the new and second-hand properties for the other towns excluding dublin. While the new and second-hand properties both see their highest points in Q1 2020 marked in green in both the plots we see a huge difference in the trend of second-hand properties between dublin and other towns.
+
+After the Q1 2014, the second-hand properties of other towns did not increase that much while the second-had properties in dublin shows an increasing trend. This shows us that the second hand prices trend will go even higher and someone who's trying to make an investment in the second-hand properties should prefer buying in the dublin towns compared to the other towns. 
+
+On the other hand, buying a new house/apartment will be profitable both in dublin and other towns on the long run. We see a steady growth in trend of the new house/apartment prices for other towns but in dublin we see a sudden decreasing trend in Q2 2015 which again picked up in the next quarter.
+
+This is the trend analysis that we can see considering the limitation that we do not have information regarding the size of the property and will be impacted by the number of sales in each quarter too.
+
+In the below graph, one can zoom in to any specific time for the last 10 years and compare it's new properties vs second-hand properties trend between dublin and other towns at the same time as the two plots are synchronized too for easy access.
 
 ### References
 

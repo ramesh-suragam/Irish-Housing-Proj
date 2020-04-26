@@ -536,10 +536,6 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
 
 ```{r}
 #Loading libraries
-suppressMessages(library(dplyr))
-suppressMessages(library(tidyverse))
-suppressMessages(library(ggplot2))
-suppressMessages(library(plotly))
 suppressMessages(library(dygraphs))
 suppressMessages(library(xts))
 ```
@@ -593,15 +589,19 @@ hp4$sale_date <- as.yearqtr(hp4$sale_date, format = "%Y-%m-%d")
 #Subsetting only dublin towns with New and Second house /Apartment information
 hp5 <- subset(hp4, county == 'dublin')
 
+#Grouping data by desc and sale date and calculating the corresponding median price
 hp5 <- aggregate(hp5[, 9], list(hp5$desc,hp5$sale_date), median)
 names(hp5) <- c("desc","sale_date","count")
 
 # hp5 <- hp5 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
 
+#spreading the data to get the desired format
 hp5 <- spread(hp5, desc, count) 
 
+#creating the time series
 hp5_ts <-xts(x = hp5, order.by = hp5$sale_date)
 
+#creating the dygraph which is an interactive plot to show the comparision between new and second-hand properties in Dublin
 hp5_dub_dyg <- dygraph(hp5_ts, width = 400, height = 300, group = "nh_sh", main = "Dublin New vs Second-Hand Houses/Apartments") %>% 
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
   dyRangeSelector() %>%
@@ -616,15 +616,19 @@ hp5_dub_dyg <- dygraph(hp5_ts, width = 400, height = 300, group = "nh_sh", main 
 #Subsetting other towns with New and Second house /Apartment information
 hp6 <- subset(hp4, county != 'dublin')
 
+#Grouping data by desc and sale date and calculating the corresponding median price
 hp6 <- aggregate(hp6[, 9], list(hp6$desc,hp6$sale_date), median)
 names(hp6) <- c("desc","sale_date","count")
 
 # hp6 <- hp6 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
 
+#spreading the data to get the desired format
 hp6 <- spread(hp6, desc, count) 
 
+#creating the time series
 hp6_ts <-xts(x = hp6, order.by = hp6$sale_date)
 
+#creating the dygraph which is an interactive plot to show the comparision between new and second-hand properties in other towns
 hp6_oth_dyg <- dygraph(hp6_ts, width = 400, height = 300, group = "nh_sh", main = "Other Towns New vs Second-Hand Houses/Apartments") %>% 
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
   dyRangeSelector() %>%
@@ -639,6 +643,7 @@ hp6_oth_dyg <- dygraph(hp6_ts, width = 400, height = 300, group = "nh_sh", main 
 # hp5_dub_dyg
 # hp6_oth_dyg
 
+#Creating a list of dygraphs to create a synchronised plot
 dy_graph <- list(
   hp5_dub_dyg,hp6_oth_dyg
 )  # end list
@@ -649,6 +654,7 @@ dy_graph <- list(
 
 <div style="float:right;padding:0 0 0 20px">
 ```{r, fig.cap = c("Interactive plot for comparision between New and Second-hand properties")}
+#plotting the synchronised dygraphs created aboves
 htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid; background-color:#e9e9e9; display:inline-block;")
 ```
 </div>
@@ -664,6 +670,8 @@ On the other hand, buying a new house/apartment will be profitable both in dubli
 This is the trend analysis that we can see considering the limitation that we do not have information regarding the size of the property and will be impacted by the number of sales in each quarter too.
 
 In the below graph, one can zoom in to any specific time for the last 10 years and compare it's new properties vs second-hand properties trend between dublin and other towns at the same time as the two plots are synchronized too for easy access.
+
+<hr>
 
 ### References
 

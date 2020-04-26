@@ -2,14 +2,31 @@
 title: "Irish Property Pricing Project"
 author: "Fergal Stapleton, Amit Anchalia, Fiona Devaney, Colin Brian O'Flynn, Ramesh Suragam, Vishal Walia and John Dunne"
 date: "4/20/2020"
-output: html_document
+output: 
+  html_document:
+    theme: simplex
 ---
 
 <!-- Code to justify the text and set the font size --> 
 <style>
+<!-- h1.title { -->
+<!--   font-size: 32px; -->
+<!-- } -->
+<!-- h3{ -->
+<!--   text-align:left; -->
+<!--   font-size: 22px; -->
+<!--   color: Black; -->
+<!-- } -->
 body {
-text-align: justify;
-<!-- font-size: 10pt; --> 
+  text-align: justify;
+  color: black;
+  <!-- font-size: 10pt; -->
+}
+.dygraph-title {
+  text-align: right;
+  color: black;
+  font-weight: bold;
+  font-size: 15px;
 }
 </style>
 
@@ -534,6 +551,10 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
 
 ```
 
+<!-- <hr> -->
+### Comparision of New properties vs Second-hand properties
+<!-- <hr> -->
+
 ```{r}
 #Loading libraries
 suppressMessages(library(dygraphs))
@@ -583,26 +604,28 @@ hp4$sale_date <- as.yearqtr(hp4$sale_date, format = "%Y-%m-%d")
 # head(hp)
 ```
 
-### Comparision of New properties vs Second-hand properties
-
 ```{r}
 #Subsetting only dublin towns with New and Second house /Apartment information
 hp5 <- subset(hp4, county == 'dublin')
 
 #Grouping data by desc and sale date and calculating the corresponding median price
 hp5 <- aggregate(hp5[, 9], list(hp5$desc,hp5$sale_date), median)
-names(hp5) <- c("desc","sale_date","count")
+names(hp5) <- c("desc","sale_date","med_price")
 
-# hp5 <- hp5 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
+#Converting price to 1000's
+hp5$med_price <- hp5$med_price/1000
+
+# hp5 <- hp5 %>% group_by(desc,sale_date) %>% summarise(med_price = median(price_adj/1000))
 
 #spreading the data to get the desired format
-hp5 <- spread(hp5, desc, count) 
+hp5 <- spread(hp5, desc, med_price) 
 
 #creating the time series
 hp5_ts <-xts(x = hp5, order.by = hp5$sale_date)
 
 #creating the dygraph which is an interactive plot to show the comparision between new and second-hand properties in Dublin
 hp5_dub_dyg <- dygraph(hp5_ts, width = 400, height = 300, group = "nh_sh", main = "Dublin New vs Second-Hand Houses/Apartments") %>% 
+  dyAxis("y", label = "Median House Price(in 1000's)") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%
@@ -618,18 +641,22 @@ hp6 <- subset(hp4, county != 'dublin')
 
 #Grouping data by desc and sale date and calculating the corresponding median price
 hp6 <- aggregate(hp6[, 9], list(hp6$desc,hp6$sale_date), median)
-names(hp6) <- c("desc","sale_date","count")
+names(hp6) <- c("desc","sale_date","med_price")
 
-# hp6 <- hp6 %>% group_by(desc,sale_date) %>% summarise(count = median(price_adj))
+#Converting price to 100's
+hp6$med_price <- hp6$med_price/1000
+
+# hp6 <- hp6 %>% group_by(desc,sale_date) %>% summarise(med_price = median(price_adj))
 
 #spreading the data to get the desired format
-hp6 <- spread(hp6, desc, count) 
+hp6 <- spread(hp6, desc, med_price) 
 
 #creating the time series
 hp6_ts <-xts(x = hp6, order.by = hp6$sale_date)
 
 #creating the dygraph which is an interactive plot to show the comparision between new and second-hand properties in other towns
 hp6_oth_dyg <- dygraph(hp6_ts, width = 400, height = 300, group = "nh_sh", main = "Other Towns New vs Second-Hand Houses/Apartments") %>% 
+  dyAxis("y", label = "Median House Price(in 1000's)") %>%
   dyOptions(labelsUTC = TRUE, fillGraph=TRUE, fillAlpha=0.1, drawGrid = TRUE) %>%
   dyRangeSelector() %>%
   dyCrosshair(direction = "vertical") %>%

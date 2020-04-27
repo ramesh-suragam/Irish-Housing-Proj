@@ -16,6 +16,11 @@ knitr::opts_chunk$set(echo = TRUE)
 suppressWarnings(library(tidyverse))
 library(lubridate)
 library(magick)
+library(rgdal)
+library(ggmap)
+library(maptools)
+library(rgeos)
+library(mapproj)
 
 # Load in data
 hp <- read_csv('../data/PPR-ALL-CLEAN.csv')
@@ -81,11 +86,7 @@ Source for counties shape file:
 https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6
 
 ```{r}
-library(rgdal)
-library(ggmap)
-library(maptools)
-library(rgeos)
-library(mapproj)
+
 ire <- readOGR(dsn='../data', 
                layer='Counties__OSi_National_Statutory_Boundaries__Generalised_20m',
                stringsAsFactors = FALSE)
@@ -106,10 +107,16 @@ map_png <- function(year_var){
   coord_map() +
   expand_limits(x = counties$long, y = counties$lat) +
   labs(title=paste('Median property price by county for ', as.character(year_var), '', sep='')) +
+  labs(caption = "Fig 1. Animation showing median property prices ranging from \n   2010-2019 per county. Prices have been adjusted for VAT.") +
   labs(x = "", y = "") +
   scale_fill_manual(values = colors, drop=FALSE) +
   theme_void() +
-  theme(plot.title = element_text(hjust = 1))
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        legend.position=c(0.2, 0.85),
+        legend.key.size = unit(0.65,"line"),
+        legend.title = element_blank(), 
+        legend.text = element_text(size = 6.5))
   
   # Dublin, Limerick, Cork and Galway long an lat coordinates
   Dub_labs <- data.frame(long = c(-6.27548), 
@@ -132,7 +139,7 @@ map_png <- function(year_var){
   
   ire_map + 
     geom_point(data = Dub_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
-    geom_text(data = Dub_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.5, hjust = "right"), size = 3) +
+    geom_text(data = Dub_labs, mapping=aes(x=long, y=lat, label=names, vjust = -0.9, hjust = "right"), size = 3) +
     geom_point(data = Lim_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 
     geom_text(data = Lim_labs, mapping=aes(x=long, y=lat, label=names, vjust = "top", hjust = "left"), size = 3) +
     geom_point(data = cork_labs, mapping=aes(x=long, y=lat),color = 'blue', alpha=0.5, size = 1) + 

@@ -1,6 +1,6 @@
 ---
 title: "Clean_dataset_code"
-author: "Fiona Devaney"
+author: "Fiona Devaney and Fergal Stapleton"
 date: "4/11/2020"
 output: html_document
 ---
@@ -9,15 +9,19 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Load libraries
+
+
+#### Load libraries
 ```{r}
 suppressMessages(library(tidyverse))
 suppressMessages(library(lubridate))
 ```
 
-## Load PPR dataset
+
+
+#### Load PPR dataset
 ```{r}
-hp <- read.csv("../data/PPR-ALL.csv", header=F) 
+hp <- read.csv("./data/PPR-ALL.csv", header=F) 
 # header=F as wouldn't load otherwise due to euro symbol for price
 
 # Add column names
@@ -31,23 +35,30 @@ hp<-hp[-1, ]
 hp<-hp[,-c(3,9)]
 ```
 
-## Manipulate sale_date variable
+
+
+#### Create a new column for year only
 ```{r}
 hp$sale_date<-dmy(hp$sale_date)
 hp$year<-year(hp$sale_date)
 ```
 
-## Manipulate address and county variables - change to all lower case
+
+
+#### Manipulate address and county variables - change to all lower case
 ```{r}
 # remove funny symbols from address
 hp$address <-str_replace_all(hp$address,"[^[:graph:]]", " ")
+# replace all ^[:graph:] (not alphanumerical or punctuation)
 
 # change addresses to all lowercase to facilitate town name search
 hp <- hp %>% mutate(address = tolower(address))
 hp <- hp %>% mutate(county = tolower(county))
 ```
 
-## Manipulate price variable 
+
+
+#### Manipulate price variable 
 ```{r}
 # Remove euro symbol and comma from price values
 hp$price <- gsub('[\x80]','', hp$price)
@@ -60,30 +71,38 @@ hp1 <- hp %>% mutate_at("price", as.numeric)
 hp1$price_adj <- ifelse(hp1$vx =='Yes', hp1$price*1.135, hp1$price*1)
 ```
 
-## Outlier check
+
+
+#### Outlier check
 ```{r}
 # check for missing values
-hp1[!complete.cases(hp1),] 
+miss <- hp1[!complete.cases(hp1),] 
 # no missing values
 
 # how many properties are not the full market price
 nfmp <- subset(hp1, nfmp=="Yes") 
-# 20256 obs (nearly 5% of the dataset) - we've decided to keep these in the dataset
+# 20256 obs (nearly 5% of the dataset). Note these are not outliers - these are just properties which did not sell at full market price.
 
 # check how many really large and really low values we have
 f <- fivenum(hp1$price_adj)
 # there is a huge jump between the minimum value and lower quartile, and similarly between the upper quartile and maximum value
 
 # number of outliers
-length(boxplot.stats(hp1$price_adj)$out) 
-# 22145. However threshold for high house price outliers is 586452.50, which is too low in my opinion.
+out <- length(boxplot.stats(hp1$price_adj)$out) 
+# 22145. However threshold for high house price outliers is 586452.50, which is too low in the group's opinion.
 
-# Unusual house prices will be addressed in the next chunk of code.
+# check for duplicates in the dataset
+hp1_dup <- hp1
+dup_idx <- duplicated(hp1_dup)
+dup_rows1 <- hp1_dup[dup_idx, ]
+# 594 duplicates. There are often scenarios where a developer may buy several properties for a single sum on a particular date. This transaction can be entered multiple times for each property but under the same address for the same amount. Some duplicates are genuine errors which the PPR acknowledges. As the amount of duplicates represents less than 0.2% of the dataset, spread across many towns and counties, we left duplicates as is, as we felt the time cost of trying to extract the genuine errors from the data outbalanced the value of doing it.
+
 ```
 
-## Multi-unit properites
-```{r}
 
+
+#### Multi-unit properties
+```{r}
 # There are issues with the multi-unit properties due to the fact that they are not consistently recorded within the dataset. Some are entered as a range, however others use text ('XXX apts' or 'apartments') or '&' etc. 
 
 # Used to insure counts are correct
@@ -128,7 +147,7 @@ hp1 <- full_join(hp1, filter3)
 # naming criteria for multi-unit properties
 hp2 <- subset(hp1, price_adj <= 10000000)
 
-write.csv(hp2, "../data/PPR-ALL-CLEAN.csv") 
-
+# export clean dataset as a .csv file
+write.csv(hp2, "./data/PPR-ALL-CLEAN.csv") 
 
 ```

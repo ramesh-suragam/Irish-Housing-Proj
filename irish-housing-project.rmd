@@ -224,14 +224,14 @@ Ireland being a small island nation means it has many coastal towns, both histor
 
 
 ```{r echo=FALSE, fig.height = 6, fig.width = 12, fig.align = "center"}
-knitr::include_graphics("./Coastal-towns/Med_Bar.gif")
+knitr::include_graphics("coastal-towns/Med_Bar.gif")
 ```
 
 The barplot shows a total decrease in property prices across the whole of Ireland. This downward trend began in 2008, before the earlest year in this dataset. It is not until 2014/2015 that prices begin to increase again. The house prices in Leinster and Munster coastal towns rebound faster than those in Ulster. Connacht towns appear on both ends of the house/apartment price scale, revealing that this provence has both wealthy towns and poorer ones.
 
 
 ```{r echo=FALSE,fig.height = 5, fig.width = 10, fig.align = "center"}
-knitr::include_graphics("./Coastal-towns/New_Second.gif")
+knitr::include_graphics("coastal-towns/New_Second.gif")
 
 ```
 
@@ -368,7 +368,7 @@ htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid
 ```
 </div>
 
-When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in Dublin towns or other towns. The below interactive plot helps us in making this decision by understanding the trends across the last ten years.
+When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in Dublin towns or other towns. The adjacent <b>interactive</b> plot helps us in making this decision by understanding the trends across the last ten years.
 
 The time-period between Q3 2012 and Q1 2014 marked in red in plot 1 is the lowest point of prices for both new and second-hand properties for the dublin towns. One the other hand, the time-period between Q1 2013 and Q2 2014 marked in red in plot 2 is the lowest point of the prices for both the new and second-hand properties for the other towns excluding dublin. While the new and second-hand properties both see their highest points in Q1 2020 marked in green in both the plots we see a huge difference in the trend of second-hand properties between dublin and other towns.
 

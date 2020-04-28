@@ -1,0 +1,258 @@
+---
+title: "Towns"
+author: "Fiona Devaney"
+date: "4/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+#### Load packages
+```{r}
+suppressMessages(library(tidyverse)) 
+suppressMessages(library(plotly))
+```
+
+
+#### Read in the clean dataset
+```{r}
+hp <- read.csv("PPR-ALL-CLEAN.csv")
+
+# remove funny symbols (i.e. fadas) from address variable
+hp$address <-str_replace_all(hp$address,"[^[:alnum:]]", " ")
+hp2 <- hp
+
+```
+
+
+#### Extract a selection of towns from different regions around Ireland
+```{r}
+
+smithfield <- hp2[grepl("smithfield", hp2[["address"]]) & grepl("dublin", hp2[["county"]]), ]
+smithfield$town <- rep("Smithfield",nrow(smithfield))
+smithfield$region <- rep("Eastern", nrow(smithfield))
+smithfield$dist <- rep("0 km", nrow(smithfield))
+
+tallaght <- hp2[grepl("tallaght", hp2[["address"]]) & grepl("dublin", hp2[["county"]]), ]
+tallaght$town <- rep("Tallaght",nrow(tallaght))
+tallaght$region <- rep("Eastern", nrow(tallaght))
+tallaght$dist <- rep("<10 km", nrow(tallaght))
+
+maynooth <- hp2[grepl("maynooth", hp2[["address"]]) & grepl("kildare", hp2[["county"]]), ]
+maynooth$town <- rep("Maynooth",nrow(maynooth))
+maynooth$region <- rep("Eastern", nrow(maynooth))
+maynooth$dist <- rep("<30 km", nrow(maynooth))
+
+newbridge <- hp2[grepl("newbridge", hp2[["address"]]) & grepl("kildare", hp2[["county"]]), ]
+newbridge$town <- rep("Newbridge",nrow(newbridge))
+newbridge$region <- rep("Eastern", nrow(newbridge))
+newbridge$dist <- rep(">30 km", nrow(newbridge))
+
+cork_city <- hp2[grepl("cork city", hp2[["address"]]) & grepl("cork", hp2[["county"]]), ]
+cork_city$town <- rep("Cork City",nrow(cork_city))
+cork_city$region <- rep("Southern", nrow(cork_city))
+cork_city$dist <- rep("0 km", nrow(cork_city))
+
+blarney <- hp2[grepl("blarney", hp2[["address"]]) & grepl("cork", hp2[["county"]]), ]
+blarney$town <- rep("Blarney",nrow(blarney))
+blarney$region <- rep("Southern", nrow(blarney))
+blarney$dist <- rep("<10 km", nrow(blarney))
+
+mallow <- hp2[grepl("mallow", hp2[["address"]]) & grepl("cork", hp2[["county"]]), ]
+mallow$town <- rep("Mallow",nrow(mallow))
+mallow$region <- rep("Southern", nrow(mallow))
+mallow$dist <- rep("<30 km", nrow(mallow))
+
+charleville <- hp2[grepl("charleville", hp2[["address"]]) & grepl("cork", hp2[["county"]]), ]
+charleville$town <- rep("Charleville",nrow(charleville))
+charleville$region <- rep("Southern", nrow(charleville))
+charleville$dist <- rep(">30 km", nrow(charleville))
+
+galway_city <- hp2[grepl("galway city", hp2[["address"]]) & grepl("galway", hp2[["county"]]), ]
+galway_city$town <- rep("Galway City",nrow(galway_city))
+galway_city$region <- rep("Western", nrow(galway_city))
+galway_city$dist <- rep("0 km", nrow(galway_city))
+
+oranmore <- hp2[grepl("oranmore", hp2[["address"]]) & grepl("galway", hp2[["county"]]), ]
+oranmore$town <- rep("Oranmore",nrow(oranmore))
+oranmore$region <- rep("Western", nrow(oranmore))
+oranmore$dist <- rep("<10 km", nrow(oranmore))
+
+athenry <- hp2[grepl("athenry", hp2[["address"]]) & grepl("galway", hp2[["county"]]), ]
+athenry$town <- rep("Athenry",nrow(athenry))
+athenry$region <- rep("Western", nrow(athenry))
+athenry$dist <- rep("<30 km", nrow(athenry))
+
+loughrea <- hp2[grepl("loughrea", hp2[["address"]]) & grepl("galway", hp2[["county"]]), ]
+loughrea$town <- rep("Loughrea",nrow(loughrea))
+loughrea$region <- rep("Western", nrow(loughrea))
+loughrea$dist <- rep(">30 km", nrow(loughrea))
+
+limerick_city <- hp2[grepl("limerick city", hp2[["address"]]) & grepl("limerick", hp2[["county"]]), ]
+limerick_city$town <- rep("Limerick City",nrow(limerick_city))
+limerick_city$region <- rep("South West", nrow(limerick_city))
+limerick_city$dist <- rep("0 km", nrow(limerick_city))
+
+croom <- hp2[grepl("croom", hp2[["address"]]) & grepl("limerick", hp2[["county"]]), ]
+croom$town <- rep("Croom",nrow(croom))
+croom$region <- rep("South West", nrow(croom))
+croom$dist <- rep("<10 km", nrow(croom))
+
+castletroy <- hp2[grepl("castletroy", hp2[["address"]]) & grepl("limerick", hp2[["county"]]), ]
+castletroy$town <- rep("Castletroy",nrow(castletroy))
+castletroy$region <- rep("South West", nrow(castletroy))
+castletroy$dist <- rep("<30 km", nrow(castletroy))
+
+abbeyfeale <- hp2[grepl("abbeyfeale", hp2[["address"]]) & grepl("limerick", hp2[["county"]]), ]
+abbeyfeale$town <- rep("Abbeyfeale",nrow(abbeyfeale))
+abbeyfeale$region <- rep("South West", nrow(abbeyfeale))
+abbeyfeale$dist <- rep(">30 km", nrow(abbeyfeale))
+
+drogheda <- hp2[grepl("drogheda", hp2[["address"]]) & grepl("meath", hp2[["county"]]), ]
+drogheda$town <- rep("Drogheda",nrow(drogheda))
+drogheda$region <- rep("North East", nrow(drogheda))
+drogheda$dist <- rep("0 km", nrow(drogheda))
+
+bettystown <- hp2[grepl("bettystown", hp2[["address"]]) & grepl("meath", hp2[["county"]]), ]
+bettystown$town <- rep("Bettystown",nrow(bettystown))
+bettystown$region <- rep("North East", nrow(bettystown))
+bettystown$dist <- rep("<10km", nrow(bettystown))
+
+slane <- hp2[grepl("slane", hp2[["address"]]) & grepl("meath", hp2[["county"]]), ]
+slane$town <- rep("Slane",nrow(slane))
+slane$region <- rep("North East", nrow(slane))
+slane$dist <- rep("<30km", nrow(slane))
+
+nobber <- hp2[grepl("nobber", hp2[["address"]]) & grepl("meath", hp2[["county"]]), ]
+nobber$town <- rep("Nobber",nrow(nobber))
+nobber$region <- rep("North East", nrow(nobber))
+nobber$dist <- rep(">30 km", nrow(nobber))
+
+strandhill <- hp2[grepl("strandhill", hp2[["address"]]) & grepl("sligo", hp2[["county"]]), ]
+strandhill$town <- rep("Strandhill",nrow(strandhill))
+strandhill$region <- rep("North West", nrow(strandhill))
+strandhill$dist <- rep("0 km", nrow(strandhill))
+
+collooney <- hp2[grepl("collooney", hp2[["address"]]) & grepl("sligo", hp2[["county"]]), ]
+collooney$town <- rep("Collooney",nrow(collooney))
+collooney$region <- rep("North West", nrow(collooney))
+collooney$dist <- rep("<10 km", nrow(collooney))
+
+ballymote <- hp2[grepl("ballymote", hp2[["address"]]) & grepl("sligo", hp2[["county"]]), ]
+ballymote$town <- rep("Ballymote",nrow(ballymote))
+ballymote$region <- rep("North West", nrow(ballymote))
+ballymote$dist <- rep("<30 km", nrow(ballymote))
+
+ballaghadereen <- hp2[grepl("ballaghadereen", hp2[["address"]]) & grepl("roscommon", hp2[["county"]]), ]
+ballaghadereen$town <- rep("Ballaghadereen",nrow(ballaghadereen))
+ballaghadereen$region <- rep("North West", nrow(ballaghadereen))
+ballaghadereen$dist <- rep(">30 km", nrow(ballaghadereen))
+
+letterkenny <- hp2[grepl("letterkenny", hp2[["address"]]) & grepl("donegal", hp2[["county"]]), ]
+letterkenny$town <- rep("Letterkenny",nrow(letterkenny))
+letterkenny$region <- rep("North", nrow(letterkenny))
+letterkenny$dist <- rep("0 km", nrow(letterkenny))
+
+manorcunningham <- hp2[grepl("manorcunningham", hp2[["address"]]) & grepl("donegal", hp2[["county"]]), ]
+manorcunningham$town <- rep("Manorcunningham",nrow(manorcunningham))
+manorcunningham$region <- rep("North", nrow(manorcunningham))
+manorcunningham$dist <- rep("<10 km", nrow(manorcunningham))
+
+ballybofey <- hp2[grepl("ballybofey", hp2[["address"]]) & grepl("donegal", hp2[["county"]]), ]
+ballybofey$town <- rep("Ballybofey",nrow(ballybofey))
+ballybofey$region <- rep("North", nrow(ballybofey))
+ballybofey$dist <- rep("<30 km", nrow(ballybofey))
+
+ardara <- hp2[grepl("ardara", hp2[["address"]]) & grepl("donegal", hp2[["county"]]), ]
+ardara$town <- rep("Ardara",nrow(ardara))
+ardara$region <- rep("North", nrow(ardara))
+ardara$dist <- rep(">30 km", nrow(ardara))
+
+athlone <- hp2[grepl("athlone", hp2[["address"]]) & grepl("westmeath", hp2[["county"]]), ]
+athlone$town <- rep("Athlone",nrow(athlone))
+athlone$region <- rep("Midlands", nrow(athlone))
+athlone$dist <- rep("0 km", nrow(athlone))
+
+moate <- hp2[grepl("moate", hp2[["address"]]) & grepl("westmeath", hp2[["county"]]), ]
+moate$town <- rep("Moate",nrow(moate))
+moate$region <- rep("Midlands", nrow(moate))
+moate$dist <- rep("<10 km", nrow(moate))
+
+ballymahon <- hp2[grepl("ballymahon", hp2[["address"]]) & grepl("longford", hp2[["county"]]), ]
+ballymahon$town <- rep("Ballymahon",nrow(ballymahon))
+ballymahon$region <- rep("Midlands", nrow(ballymahon))
+ballymahon$dist <- rep("<30 km", nrow(ballymahon))
+
+edgeworthstown <- hp2[grepl("edgeworthstown", hp2[["address"]]) & grepl("longford", hp2[["county"]]), ]
+edgeworthstown$town <- rep("Edgeworthstown",nrow(edgeworthstown))
+edgeworthstown$region <- rep("Midlands", nrow(edgeworthstown))
+edgeworthstown$dist <- rep(">30 km", nrow(edgeworthstown))
+
+coolcotts <- hp2[grepl("coolcotts", hp2[["address"]]) & grepl("wexford", hp2[["county"]]), ]
+coolcotts$town <- rep("Coolcotts",nrow(coolcotts))
+coolcotts$region <- rep("South East", nrow(coolcotts))
+coolcotts$dist <- rep("0 km", nrow(coolcotts))
+
+castlebridge <- hp2[grepl("castlebridge", hp2[["address"]]) & grepl("wexford", hp2[["county"]]), ]
+castlebridge$town <- rep("Castlebridge",nrow(castlebridge))
+castlebridge$region <- rep("South East", nrow(castlebridge))
+castlebridge$dist <- rep("<10 km", nrow(castlebridge))
+
+kilmuckridge <- hp2[grepl("kilmuckridge", hp2[["address"]]) & grepl("wexford", hp2[["county"]]), ]
+kilmuckridge$town <- rep("Kilmuckridge",nrow(kilmuckridge))
+kilmuckridge$region <- rep("South East", nrow(kilmuckridge))
+kilmuckridge$dist <- rep("<30 km", nrow(kilmuckridge))
+
+bunclody <- hp2[grepl("bunclody", hp2[["address"]]) & grepl("wexford", hp2[["county"]]), ]
+bunclody$town <- rep("Bunclody",nrow(bunclody))
+bunclody$region <- rep("South East", nrow(bunclody))
+bunclody$dist <- rep(">30 km", nrow(bunclody))
+```
+
+
+#### Combine town datasets together
+```{r}
+hp_town <- rbind(smithfield, tallaght, maynooth, newbridge, cork_city, blarney, mallow, charleville, galway_city, oranmore, athenry, loughrea, limerick_city, croom, castletroy, abbeyfeale, drogheda, bettystown, slane, nobber, strandhill, collooney, ballymote, ballaghadereen, letterkenny, manorcunningham, ballybofey, ardara, athlone, moate, ballymahon, edgeworthstown, coolcotts, castlebridge, kilmuckridge, bunclody)
+
+write.csv(hp_town, "hp_town.csv")
+```
+
+
+#### Plot towns at region level
+```{r, fig.cap="**Fig. 2: Property price change for towns within different regions of Ireland (2010-2020)**"}
+
+change <- 
+  hp_town %>%
+    group_by(year, town, region, dist) %>%
+    summarise(hprice=median(price_adj/1000))
+
+change$town_f <- factor(change$town, levels=c("Drogheda", "Bettystown", "Slane", "Nobber","Smithfield", "Tallaght", "Maynooth", "Newbridge","Athlone", "Moate", "Ballymahon", "Edgeworthstown", "Coolcotts", "Castlebridge", "Kilmuckridge", "Bunclody", "Cork City", "Blarney", "Mallow", "Charleville", "Limerick City", "Castletroy", "Croom", "Abbeyfeale", "Galway City", "Oranmore", "Athenry", "Loughrea", "Strandhill", "Collooney", "Ballymote", "Ballaghadereen", "Letterkenny", "Manorcunningham","Ballybofey","Ardara"))
+
+colours <- rep(c("orange", "red", "blue", "purple"),10)
+
+p <- ggplot(change, aes(x=year, y=hprice, color=town_f))+
+  geom_line()+
+  facet_wrap(~region)+
+  scale_x_continuous(limits= c(2010, 2020), breaks=c(2010, 2012, 2014, 2016,2018, 2020),labels=c("'10", "'12", "'14", "'16", "'18", "'20"))+
+  scale_y_continuous(limits=c(0, 400), breaks=c(0,100,200,300,400))+
+  labs(title="Orange: Primary town. Red: <10 km, Blue: <30 km, Purple: >30 km from Primary town",
+       x ="Year of Sale", y = "Median property price (euros/1000)" )
+p1 <- p + theme(legend.position = "none", axis.title = element_text(size=9), axis.text = element_text(size=8),
+                plot.title=element_text(face="bold", size=8),
+                plot.caption=element_text(hjust=0))+
+  scale_color_manual(breaks=change$dist, values=colours)
+gp <- ggplotly(p1)
+
+
+gp[['x']][['layout']][['annotations']][[1]][['y']] <- -0.06
+gp[['x']][['layout']][['annotations']][[2]][['x']] <- -0.05
+gp
+
+```
+
+
+
+

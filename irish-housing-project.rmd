@@ -39,29 +39,29 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Load libraries
 # dplyr should be always loaded after plyr to avoid group_by from failing
 if("dplyr" %in% (.packages())){
-  suppressMessages(detach("package:dplyr"))
+  suppressWarnings(suppressMessages(detach("package:dplyr")))
   if("plyr" %in% (.packages())){
-    suppressMessages(detach("package:plyr"))
+    suppressWarnings(suppressMessages(detach("package:plyr")))
   }
 }
-suppressMessages(library(plyr))
-suppressMessages(library(dplyr))
-suppressMessages(library(tidyverse))
-suppressMessages(library(lubridate))
-suppressMessages(library(plotly))
-suppressMessages(library(ggplot2))
-suppressMessages(library(GGally))
-suppressMessages(library(dygraphs))
-suppressMessages(library(xts))
+suppressWarnings(suppressMessages(library(plyr)))
+suppressWarnings(suppressMessages(library(dplyr)))
+suppressWarnings(suppressMessages(library(tidyverse)))
+suppressWarnings(suppressMessages(library(lubridate)))
+suppressWarnings(suppressMessages(library(plotly)))
+suppressWarnings(suppressMessages(library(ggplot2)))
+suppressWarnings(suppressMessages(library(GGally)))
+suppressWarnings(suppressMessages(library(dygraphs)))
+suppressWarnings(suppressMessages(library(xts)))
 ```
 
 
-### Abstract
+### **Abstract**
 
 The objective of this project is to analyse the housing market in Ireland from 2010 to 2019 using strong visualisations to support our analysis. We will also offer house price predictions for 2020 through to 2022. In addtion we will conduct a more granular study of commuter and costal towns offering analysis of trends relating to this data. In the next section we will provide a general overview starting with a brief discussion about the recession, its effects and the aftermath. This will be followed by a look at changes in house prices over time at a regional level in Ireland.
 
 
-### Overview
+### **Overview**
 
 The global economic crash of 2008 had a profound effect on the housing market in Ireland.[2] Ireland was severly hit becomming the first european country to offically enter recession status in september of 2008 and which lasted well into 2013 and which effectively brought to an end to what is colloquially refered to as the 'Celtic Tiger', a period of economic growth that originated in the early 1990's.
 
@@ -77,7 +77,7 @@ To aid in our overview a Choropleth animation was created using data from the Or
 
 
 
-In general property prices appear to be increasing and further detail will be given in the following sections
+In general property prices appear to be increasing and further detail will be given in the following sections.
 
 
 #### **Data Cleansing**
@@ -131,7 +131,7 @@ In general, primary towns, and moreso, towns within 10 km of these, tended to ha
 
 
 
-### Analysis of Dublin Commuter Belt
+### **Analysis of Dublin Commuter Belt**
 
 The Dublin commuter belt was originally an area of land beyond the M50 motorway where people who worked in the city would buy homes which were more affordable than the properties in the inner city. The Dublin commuter belt initially comprised towns such as Lucan and Swords. However, since the height of the housing bubble in the early 2000’s the Dublin commuter belt began to spread into the adjoining counties of Kildare and Meath until it’s halt was eventually precipitated by the 2008 housing collapse. The heat map below shows the median house and apartment prices in the period from 2010 to 2019 in the counties of Kildare and Meath. The heat map is illustrative of the sharp fall in property prices that was witnessed in the years from 2011 until 2013 followed by a resurgence in property prices from mid 2014 onwards. Property prices grew strongly from 2014 where the median price was €193,000 until the end of 2019 where the median price had risen to €268,722 in the Kildare, Meath areas.[5] 
 
@@ -219,7 +219,7 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
 ```
 
 <!-- <hr> -->
-### Comparision of New properties vs Second-hand properties
+### **Comparision of New properties vs Second-hand properties**
 <!-- <hr> -->
 
 ```{r}
@@ -362,7 +362,38 @@ In the below graph, one can zoom in to any specific time for the last 10 years a
 
 <hr>
 
-### References
+
+### **House price change by region**
+
+Further, if we consider the median price with distance from the regions, the median price for regions like Easter, Northern, South West increases up to 30km and then decreases, for other regions like Midlands, North East, South East, Southern, Western median price increase up to 10km and then decreases. North West is an exception here where the median price tends to decrease with distance.
+
+```{r }
+knitr::include_graphics('./png/Property price with distance from region.png')
+```
+
+### **House price change by towns over the year**
+
+Considering some major towns in different regions the median price for most of the towns has a decreasing trend till 2013 or 2014 and then an increased trend, except Maynooth and Nobber which have an increasing trend since 2011 and 2010 respectively.
+
+```{r }
+knitr::include_graphics('./png/Median price of property in towns.png')
+```
+
+When we compare the average house price for different Irish towns, we observed that towns in east of the country have high prices as compare to other parts. Dundrum, Maynooth and Smithfield which are near Dublin have high prices throughout. We also used time series to forecast the house prices for year 2020 and 2021.
+
+```{r }
+knitr::include_graphics('./png/Rate Change.png')
+```
+
+
+When we compare average house price with total sale, we observed that total sale is high in east of the country again demonstrating economic inequality between east and rest of the country. Cluster shows that Maynooth has high sale and prices as compare to other towns.
+
+```{r }
+knitr::include_graphics('./png/Average House price.png')
+```
+
+
+### **References**
 
 [1] https://www.propertypriceregister.ie/website/npsra/pprweb.nsf/page/ppr-home-en \
 [2] https://en.wikipedia.org/wiki/Post-2008_Irish_economic_downturn \

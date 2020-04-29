@@ -23,9 +23,11 @@ In order to run the subsequent sections first the data must be cleaned. To do th
 -	irish-housing-project-master/data/ST662_Clean_dataset_code.Rmd
 -	irish-housing-project-master/data/ST662_Towns_final.Rmd
 
-install.packages("lubridate")
-install.packages("tidyverse")
+```
+install.packages("lubridate")  
+install.packages("tidyverse")  
 install.packages("plotly")
+```
 
 ## Choropleth map
 

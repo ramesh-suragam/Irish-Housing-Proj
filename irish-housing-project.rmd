@@ -376,10 +376,10 @@ dy_graph <- list(
 # htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid; background-color:#e9e9e9; display:inline-block;")
 ```
 
-<div style="float:right;padding:0 0 0 20px">
-```{r, fig.cap = c("Interactive plot for comparision between New and Second-hand properties")}
+<div style="float:right;">
+```{r}
 #plotting the synchronised dygraphs created aboves
-htmltools::tags$div(dy_graph, style = "padding:10px; width: 450px; border: solid; background-color:#e9e9e9; display:inline-block;")
+htmltools::tags$div(dy_graph, style = "width: 450px; padding:15px; margin: 0 0 0 20px; border: 2px solid; background-color:#e9e9e9; border-radius: 10px; display:inline-block;")
 ```
 </div>
 

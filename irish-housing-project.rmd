@@ -9,18 +9,25 @@ output:
 
 <!-- Code to justify the text and set the font size --> 
 <style>
-<!-- h1.title { -->
-<!--   font-size: 32px; -->
-<!-- } -->
-<!-- h3{ -->
-<!--   text-align:left; -->
-<!--   font-size: 22px; -->
-<!--   color: Black; -->
-<!-- } -->
+h1.title {
+  font-size: 32px;
+  font-weight: bold;
+}
+h4.author {
+  font-size: 16px;
+  font-style: italic;
+}
+h4.date {
+  font-size: 16px;
+  font-style: italic;
+}
 body {
   text-align: justify;
   color: black;
-  <!-- font-size: 10pt; -->
+}
+p.caption {
+  font-size: 0.85em;
+  font-weight: bold;
 }
 .dygraph-title {
   text-align: right;
@@ -58,8 +65,7 @@ suppressWarnings(suppressMessages(library(xts)))
 ```
 
 <hr>
-### **Introduction**
-
+### **Introduction:**
 The global economic crash of 2008 had a profound effect on the housing market in Ireland.[1] Ireland was severely hit becoming the first European country to officially enter recession status in September 2008. The recession lasted well into 2013 and effectively brought an end to what is colloquially referred to as the 'Celtic Tiger'; a period of economic growth that originated in the early 1990's.
 
 ```{r fig.width= 6, fig.height= 3, out.width= "50%", out.extra='style="float:right; padding:10px"', echo=FALSE}
@@ -77,12 +83,13 @@ To aid in our overview a Choropleth animation was created using data from the Or
 In general property prices appear to be increasing and further detail will be given in the following sections.
 
 <hr>
-### **Methodology**
-#### **Data Cleansing**
+### **Methodology:**
+<hr>
+#### **Data Cleansing:**
 
 The dataset used in this analysis was downloaded on the 03/04/2020 as a .csv file from the Property Services Regulatory Authority website [4]. At time of download it contained 416380 observations with nine variables. Before data analysis commenced, the dataset was read-in and examined. The price variable required removal of the euro symbol and commas, and new properties had their prices adjusted to include VAT (stored in a new variable 'price_adj'). Redundant variables were removed and a new variable containing just the year of sale was created ('year'). Property addresses and county names were converted to lower case and non-alphanumerical and non-punctuation characters were removed. The dataset was checked for missing values (none present) and outliers. There were a number of very low priced properties - we did not treat these as outliers as they could be either very rundown properties, bedsits above a shop, or a very small plot of land (particularly during the recession when prices were at an all-time low). Higher priced observations were looked at in more detail, with the majority identified as multi-unit properties. The final step in the data cleansing section involved splitting these properties into separate observations, each imputed with the mean adjusted price for that address. Observations greater than 10 million euros were removed as we felt that these most likely represented multi-unit properties rather than an individual property. There are a number of duplicates in the dataset, however some are genuine (the same property sold more than once), some are present as an artefact of splitting multi-unit properties, with the remainder as either genuine errors or multiple properties sold together under the one address. As there was no way of determining which were errors and which were genuine, we left them in. We felt the time cost of trying to extract the genuine errors from the data outbalanced the value of doing it. The cleaned dataset was saved as a .csv and named ‘PPR-ALL-CLEAN.csv’.
 
-#### **Data Manipulation and Extraction**
+#### **Data Manipulation and Extraction:**
 There were a number of datasets created in order to explore property price change (2010-2020), and to create our visualisations in the results section. Please refer to the individual .rmd files in the project folder for the methodology used to manipulate and extract the relevant data for each dataset.
 
 
@@ -91,8 +98,9 @@ knitr::include_graphics('./png/Property price with distance from region.png')
 ```
 
 <hr>
-### **Results**
-#### **Property price change by region**
+### **Exploratory Analysis:**
+<hr>
+#### **Property price change by region:**
 For the first part of our analysis, Ireland was divided into nine geographical regions. Four towns per region were selected: a primary town (urban/large), followed by three more towns with increasing distance from the primary. The aim was two-fold: investigate whether property prices change with increasing distance from the primary town, and determine whether a regional difference in property prices exists.
 
 
@@ -143,7 +151,7 @@ In general, primary towns, and moreso, towns within 10 km of these, tended to ha
 For the next stage of our analysis we looked at property price change in the Dublin commuter belt, followed by property price change in our coastal towns. 
 
 <hr>
-#### **Analysis of Dublin Commuter Belt**
+#### **Analysis of Dublin Commuter Belt:**
 
 The Dublin commuter belt was originally an area of land beyond the M50 motorway where people who worked in the city would buy homes which were more affordable than the properties in the inner city. The Dublin commuter belt initially comprised towns such as Lucan and Swords. However, since the height of the housing bubble in the early 2000’s the Dublin commuter belt began to spread into the adjoining counties of Kildare and Meath until it’s halt was eventually precipitated by the 2008 housing collapse. The heat map below shows the median house and apartment prices in the period from 2010 to 2019 in the counties of Kildare and Meath. The heat map is illustrative of the sharp fall in property prices that was witnessed in the years from 2011 until 2013 followed by a resurgence in property prices from mid 2014 onwards. Property prices grew strongly from 2014 where the median price was €193,000 until the end of 2019 where the median price had risen to €268,722 in the Kildare, Meath areas.[5] 
 
@@ -211,8 +219,7 @@ median_prices$monthf <- factor(median_prices$monthf,labels=c("Jan","Feb","Mar","
 
 ```
 
-<div style="float:right; padding:20px">
-```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE, fig.cap="Fig 3. Heatmap of property prices in Dublin commuter belt (2010-2019)", fig.align="center"}
+```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE, fig.cap="Fig 3: Heatmap of property prices in Dublin commuter belt (2010-2019)", fig.align="center"}
  # Heat Map of Kildare and Meath house prices
 ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) + 
   geom_tile(colour = "white") + 
@@ -228,23 +235,22 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
         #axis.ticks.y=element_blank(),
         axis.text.y = element_text(size=4.0)
         ) 
-
 ```
-</div>
 
-#### **Coastal Towns**
+<hr>
+#### **Coastal Towns:**
 
 Ireland being a small island nation means it has many coastal towns, both historic and newly developed. All the major cities in Ireland are close to the sea. This section of the report focuses on the financial impact that the 2008 recession had on smaller coastal towns, and how much they have recovered. The 40 towns were grouped by provence to see which area of the country faired best after the recession.
 
 
-```{r echo=FALSE, fig.height = 6, fig.width = 12, fig.align = "center"}
+```{r echo=FALSE, fig.height = 6, fig.width = 12, fig.cap = "Fig 4: Median property price change for costal towns", fig.align = "center"}
 knitr::include_graphics("coastal-towns/Med_Bar.gif")
 ```
 
 The barplot shows a total decrease in property prices across the whole of Ireland. This downward trend began in 2008, before the earliest year in this dataset. It is not until 2014/2015 that prices begin to increase again. The house prices in Leinster and Munster coastal towns rebound faster than those in Ulster. Connacht towns appear on both ends of the house/apartment price scale, revealing that this provence has both wealthy towns and poorer ones.
 
 
-```{r echo=FALSE,fig.height = 5, fig.width = 10, fig.align = "center"}
+```{r echo=FALSE,fig.height = 5, fig.width = 10, fig.cap = "Fig 5: Median property price change for costal towns: New vs Second-hand", fig.align = "center"}
 knitr::include_graphics("coastal-towns/New_Second.gif")
 
 ```
@@ -253,7 +259,7 @@ knitr::include_graphics("coastal-towns/New_Second.gif")
 The line graph above shows the difference when coastal town house/apartment prices are broken up between new properties and second-hand properties. Both are at the lowest median price around 2012/2013. The second-hand prices are more steady in their decrease and eventual increase. The price of new properties is much more reactive and more prone to sharp increases or decreases. In the last 2 years, the cost of a new house in Leinster, Munster and Connacht has skyrocketed. The plot also reveals that Ulster is much different to the other provences, in that the price for new and second-hand properties are roughly the same throughout the last 10 years. We wanted to see if a similar pattern was evident when comparing all new properties against all second-hand properties, not just those in coastal towns, which led us to the next analysis.
 
 <hr>
-#### **Comparision of New properties vs Second-hand properties**
+#### **Comparision of New properties vs Second-hand properties:**
 <!-- <hr> -->
 
 ```{r}
@@ -382,7 +388,7 @@ htmltools::tags$div(dy_graph, style = "width: 450px; padding:15px; margin: 0 0 0
 ```
 </div>
 
-When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in or outside of Dublin. The adjacent <b>interactive</b> plot helps us in making this decision by understanding the trends across the last ten years.
+When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in or outside of Dublin. The adjacent <b>interactive</b> plot(Fig 6.) helps us in making this decision by understanding the trends across the last ten years.
 
 The time-period between Q3 2012 and Q1 2014 marked in red in plot 1 is the lowest point of prices for both new and second-hand properties for the Dublin towns. On the other hand, the time-period between Q1 2013 and Q2 2014 marked in red in plot 2 is the lowest point of the prices for both the new and second-hand properties for the other towns excluding Dublin. While the new and second-hand properties both see their highest points in Q1 2020 marked in green in both the plots we see a huge difference in the trend of second-hand properties between Dublin and other towns.
 
@@ -394,40 +400,40 @@ This is the trend analysis that we can see considering the limitation that we do
 
 In the below graph, one can zoom in to any specific time for the last 10 years and compare it's new properties vs second-hand properties trend between Dublin and other towns at the same time as the two plots are synchronized too for easy access.
 
-<hr>
-
 ```{r}
-htmltools::tags$figcaption("Fig 7. Interactive plot for comparision between New and Second-hand properties between Dublin & Other Towns", style = "float:right;width: 450px; padding: 10px 0 0 0; text-align:center; ")
+htmltools::tags$figcaption("Fig 6: Interactive plot for comparision between New and Second-hand properties between Dublin & Other Towns", style = "float:right;width: 450px; padding: 10px 0 0 0; text-align:center; font-size: 0.85em; font-weight: bold")
 ```
 
-#### **House price change by towns over the year**
+<hr>
+#### **House price change by towns over the year:**
 
 Considering some major towns in different regions the median price for most of the towns has a decreasing trend until 2013 or 2014 and then an increased trend, except Maynooth and Nobber which have an increasing trend since 2011 and 2010 respectively.
 
-```{r, fig.cap="Fig. 8: Median price of property in towns based on county and region", fig.align= "center"}
+```{r, fig.cap="Fig. 7: Median property price change for towns based on county and region", fig.align= "center"}
 knitr::include_graphics('./png/Median price of property in towns.png')
 ```
 
 When we compare the average house price for different Irish towns, we observed that towns in east of the country have high prices as compare to other parts. Dundrum, Maynooth and Smithfield which are near Dublin have high prices throughout. We also used time series to forecast the house prices for year 2020 and 2021.
 
-```{r, fig.cap="Fig. 9: Rate Change over year for major towns", fig.align= "center"}
+```{r, fig.cap="Fig. 8: Rate of price change over years for major towns", fig.align= "center"}
 knitr::include_graphics('./png/Rate Change.png')
 ```
 
 
 When we compare average house price with total sale, we observed that total sale is high in east of the country again demonstrating economic inequality between east and rest of the country. Cluster shows that Maynooth has high sale and prices as compare to other towns.
 
-```{r, fig.cap="Fig. 10: Average House price vs Total sale price for four towns", fig.align= "center"}
+```{r, fig.cap="Fig. 9: Average property price vs Total sale price for four towns", fig.align= "center"}
 knitr::include_graphics('./png/Average House price.png')
 ```
 
 <hr>
-### **Conclusions** 
+### **Conclusion:** 
+<hr>
 The main objective of this project was to compare property price change from 2010 to 2020 for a range of Irish towns, using insightful visualisations to display our findings. It is clear from our results that property prices in towns across Ireland saw a decrease in value until about 2012-2013 due to the global economic crash of 2008. The towns presented here, for the most part, have shown good recovery with property prices in some towns skyrocketing, particularly towns in Dublin and the Leinster/Eastern region in general. All indications points towards another property crash in the near future if property prices continue to rise unabated [6].
 
 <hr>
-### **References**
-
+### **References:**
+<hr>
 [1] https://en.wikipedia.org/wiki/Post-2008_Irish_economic_downturn \
 [2] https://en.wikipedia.org/wiki/Celtic_Tiger \
 [3] https://data.gov.ie/dataset/counties-osi-national-statutory-boundaries-generalised-20m/resource/b412ae22-ea13-4ca3-a8be-5ffc21f455f6 \

@@ -42,6 +42,8 @@ install.packages("maptools")
 install.packages("rgeos")
 install.packages("mapproj")
 
+*Note: rgeo package requires restart of rstudio to take effect*
+
 
 ## New vs second
 

@@ -11,7 +11,7 @@ The list of houses sold in a town during a single year can be viewed by putting 
 
 The main report can be found in irish-house-project.rmd and can be knitted to create a html output for the final report. 
 To allow the .rmd file to knit fastly certain section were run separately as some of the sections contain animations.
-The main report was knitted on rstudio server.
+The main report was knitted on rstudio server. Part of the reports were built in Tableau and were loaded as pngs into the main report.
 
 A brief instruction on the requirements of these sections are as follows.
 
@@ -63,3 +63,4 @@ install.packages("GGally")
 install.packages("gganimate")
 install.packages("viridis")
 ```
+

@@ -35,25 +35,31 @@ The coropleth map generates a .gif file that populates the /gif folder as well a
 
 As well as requiring lubridate and tidyverse the following packages are required;
 
+```
 install.packages("magick")
 install.packages("rgdal")
 install.packages("ggmap")
 install.packages("maptools")
 install.packages("rgeos")
 install.packages("mapproj")
+```
 
 *Note: rgeo package requires restart of rstudio to take effect*
 
 
 ## New vs second
 
+```
 install.packages("ggplot2")
 install.packages("dygraphs")
 install.packages("xts")
+```
 
 
 ## Costal towns
 
+```
 install.packages("GGally")
 install.packages("gganimate")
 install.packages("viridis")
+```

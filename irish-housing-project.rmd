@@ -212,7 +212,8 @@ median_prices$monthf <- factor(median_prices$monthf,labels=c("Jan","Feb","Mar","
 
 ```
 
-```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE}
+<div style="float:right; padding:20px">
+```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE, fig.cap="Fig 3. Heatmap of property prices in Dublin commuter belt (2010-2019)", fig.align="center"}
  # Heat Map of Kildare and Meath house prices
 ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) + 
   geom_tile(colour = "white") + 
@@ -230,6 +231,7 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
         ) 
 
 ```
+</div>
 
 #### **Coastal Towns**
 

@@ -125,7 +125,7 @@ p <- ggplot(change, aes(x=year, y=hprice, color=town_f))+
   facet_wrap(~region)+
   scale_x_continuous(limits= c(2010, 2020), breaks=c(2010, 2012, 2014, 2016,2018, 2020),labels=c("'10", "'12", "'14", "'16", "'18", "'20"))+
   scale_y_continuous(limits=c(0, 400), breaks=c(0,100,200,300,400))+
-  labs(title="Fig. 2b: Property price change for towns within different regions of Ireland (2010-2020)",
+  labs(title="Fig. 3: Property price change for towns within different regions of Ireland (2010-2020)",
        x ="Year of Sale", y = "Median property price (euros/1000)" )
 p1 <- p + theme(legend.position = "none", axis.title = element_text(size=9), axis.text = element_text(size=8),
                 plot.title=element_text(face="bold", size=8, hjust = 0.5),
@@ -145,7 +145,7 @@ gp %>% layout(annotations =
 ```
 </div>
 
-In general, primary towns, and moreso, towns within 10 km of these, tended to have the highest median property prices across all years and regions (Fig. 2a, 2b). Noticeable exceptions include Maynooth (Eastern) and Slane (North East), where both exceeded the median property price of the primary and it's next closest town, for at least half of the time period (Fig. 2b). This could be due to the fact that the proportion of houses to apartments increases further out from urban areas, with houses typically selling at a higher price than apartments. Both towns are also popular commuter towns, with demand pushing up prices in these areas. The North showed very little differentiation between it's four towns (Fig. 2a, 2b). The Northern region, along with the Midlands and North West (excluding Strandhill), had the lowest median property prices of all the regions (Fig. 2a); the Eastern region had the highest (Fig. 2a, 2b). Most towns saw a drop in median property prices from 2010 to 2012/2013, with the majority seeing a recovery and upwards trend from 2014 onwards (Fig. 2b). 
+In general, primary towns, and moreso, towns within 10 km of these, tended to have the highest median property prices across all years and regions (Fig. 2, 3). Noticeable exceptions include Maynooth (Eastern) and Slane (North East), where both exceeded the median property price of the primary and it's next closest town, for at least half of the time period (Fig. 3). This could be due to the fact that the proportion of houses to apartments increases further out from urban areas, with houses typically selling at a higher price than apartments. Both towns are also popular commuter towns, with demand pushing up prices in these areas. The North showed very little differentiation between it's four towns (Fig. 2, 3). The Northern region, along with the Midlands and North West (excluding Strandhill), had the lowest median property prices of all the regions (Fig. 3); the Eastern region had the highest (Fig. 2, 3). Most towns saw a drop in median property prices from 2010 to 2012/2013, with the majority seeing a recovery and upwards trend from 2014 onwards (Fig. 3). 
 
 
 For the next stage of our analysis we looked at property price change in the Dublin commuter belt, followed by property price change in our coastal towns. 
@@ -219,7 +219,7 @@ median_prices$monthf <- factor(median_prices$monthf,labels=c("Jan","Feb","Mar","
 
 ```
 
-```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE, fig.cap="Fig 3: Heatmap of property prices in Dublin commuter belt (2010-2019)", fig.align="center"}
+```{r, fig.width=9, fig.height= 6,eval=T, echo=FALSE, fig.cap="Fig. 4: Heatmap of property prices in Dublin commuter belt (2010-2019)", fig.align="center"}
  # Heat Map of Kildare and Meath house prices
 ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) + 
   geom_tile(colour = "white") + 
@@ -243,14 +243,14 @@ ggplot(median_prices, aes(monthweek, weekdayf, fill = mean_Price_for_day )) +
 Ireland being a small island nation means it has many coastal towns, both historic and newly developed. All the major cities in Ireland are close to the sea. This section of the report focuses on the financial impact that the 2008 recession had on smaller coastal towns, and how much they have recovered. The 40 towns were grouped by provence to see which area of the country faired best after the recession.
 
 
-```{r echo=FALSE, fig.height = 6, fig.width = 12, fig.cap = "Fig 4: Median property price change for costal towns", fig.align = "center"}
+```{r echo=FALSE, fig.height = 6, fig.width = 12, fig.cap = "Fig. 5: Median property price change for costal towns", fig.align = "center"}
 knitr::include_graphics("coastal-towns/Med_Bar.gif")
 ```
 
 The barplot shows a total decrease in property prices across the whole of Ireland. This downward trend began in 2008, before the earliest year in this dataset. It is not until 2014/2015 that prices begin to increase again. The house prices in Leinster and Munster coastal towns rebound faster than those in Ulster. Connacht towns appear on both ends of the house/apartment price scale, revealing that this provence has both wealthy towns and poorer ones.
 
 
-```{r echo=FALSE,fig.height = 5, fig.width = 10, fig.cap = "Fig 5: Median property price change for costal towns: New vs Second-hand", fig.align = "center"}
+```{r echo=FALSE,fig.height = 5, fig.width = 10, fig.cap = "Fig. 6: Median property price change for costal towns: New vs Second-hand", fig.align = "center"}
 knitr::include_graphics("coastal-towns/New_Second.gif")
 
 ```
@@ -388,7 +388,7 @@ htmltools::tags$div(dy_graph, style = "width: 450px; padding:15px; margin: 0 0 0
 ```
 </div>
 
-When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in or outside of Dublin. The adjacent <b>interactive</b> plot(Fig 6.) helps us in making this decision by understanding the trends across the last ten years.
+When it comes to house buying there is a huge dilemma whether to buy a new property or a second-hand property and whether to buy it in or outside of Dublin. The adjacent <b>interactive</b> plot(Fig. 7) helps us in making this decision by understanding the trends across the last ten years.
 
 The time-period between Q3 2012 and Q1 2014 marked in red in plot 1 is the lowest point of prices for both new and second-hand properties for the Dublin towns. On the other hand, the time-period between Q1 2013 and Q2 2014 marked in red in plot 2 is the lowest point of the prices for both the new and second-hand properties for the other towns excluding Dublin. While the new and second-hand properties both see their highest points in Q1 2020 marked in green in both the plots we see a huge difference in the trend of second-hand properties between Dublin and other towns.
 
@@ -398,10 +398,10 @@ On the other hand, buying a new house/apartment will be profitable both in Dubli
 
 This is the trend analysis that we can see considering the limitation that we do not have information regarding the size of the property and will be impacted by the number of sales in each quarter too.
 
-In the below graph, one can zoom in to any specific time for the last 10 years and compare it's new properties vs second-hand properties trend between Dublin and other towns at the same time as the two plots are synchronized too for easy access.
+For Figure 7, one can zoom in to any specific time for the last 10 years and compare it's new properties vs second-hand properties trend between Dublin and other towns at the same time as the two plots are synchronized too for easy access.
 
 ```{r}
-htmltools::tags$figcaption("Fig 6: Interactive plot for comparision between New and Second-hand properties between Dublin & Other Towns", style = "float:right;width: 450px; padding: 10px 0 0 0; text-align:center; font-size: 0.85em; font-weight: bold")
+htmltools::tags$figcaption("Fig 7: Interactive plot for comparision between New and Second-hand properties between Dublin & Other Towns", style = "float:right;width: 450px; padding: 10px 0 0 0; text-align:center; font-size: 0.85em; font-weight: bold")
 ```
 
 <hr>
@@ -409,20 +409,20 @@ htmltools::tags$figcaption("Fig 6: Interactive plot for comparision between New 
 
 Considering some major towns in different regions the median price for most of the towns has a decreasing trend until 2013 or 2014 and then an increased trend, except Maynooth and Nobber which have an increasing trend since 2011 and 2010 respectively.
 
-```{r, fig.cap="Fig. 7: Median property price change for towns based on county and region", fig.align= "center"}
+```{r, fig.cap="Fig. 8: Median property price change for towns based on county and region", fig.align= "center"}
 knitr::include_graphics('./png/Median price of property in towns.png')
 ```
 
 When we compare the average house price for different Irish towns, we observed that towns in east of the country have high prices as compare to other parts. Dundrum, Maynooth and Smithfield which are near Dublin have high prices throughout. We also used time series to forecast the house prices for year 2020 and 2021.
 
-```{r, fig.cap="Fig. 8: Rate of price change over years for major towns", fig.align= "center"}
+```{r, fig.cap="Fig. 9: Rate of price change over years for major towns", fig.align= "center"}
 knitr::include_graphics('./png/Rate Change.png')
 ```
 
 
 When we compare average house price with total sale, we observed that total sale is high in east of the country again demonstrating economic inequality between east and rest of the country. Cluster shows that Maynooth has high sale and prices as compare to other towns.
 
-```{r, fig.cap="Fig. 9: Average property price vs Total sale price for four towns", fig.align= "center"}
+```{r, fig.cap="Fig. 10: Average property price vs Total sale price for four towns", fig.align= "center"}
 knitr::include_graphics('./png/Average House price.png')
 ```
 

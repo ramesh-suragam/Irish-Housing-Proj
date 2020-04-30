@@ -415,14 +415,14 @@ knitr::include_graphics('./png/Median price of property in towns.png')
 
 When we compare the average house price for different Irish towns, we observed that towns in east of the country have high prices as compare to other parts. Dundrum, Maynooth and Smithfield which are near Dublin have high prices throughout. We also used time series to forecast the house prices for year 2020 and 2021.
 
-```{r, fig.align= "center"}
+```{r, fig.align= "center",fig.height=4,fig.width=10}
 knitr::include_graphics('./png/Rate Change.png')
 ```
 
 
 When we compare average house price with total sale, we observed that total sale is high in east of the country again demonstrating economic inequality between east and rest of the country. Cluster shows that Maynooth has high sale and prices as compare to other towns.
 
-```{r, fig.align= "center"}
+```{r, fig.align= "center",fig.height=4,fig.width=10}
 knitr::include_graphics('./png/Average House price.png')
 ```
 

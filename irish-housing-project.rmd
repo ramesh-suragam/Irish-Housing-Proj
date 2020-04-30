@@ -409,20 +409,20 @@ htmltools::tags$figcaption("Fig 7: Interactive plot for comparision between New 
 
 Considering some major towns in different regions the median price for most of the towns has a decreasing trend until 2013 or 2014 and then an increased trend, except Maynooth and Nobber which have an increasing trend since 2011 and 2010 respectively.
 
-```{r, fig.align= "center"}
+```{r, fig.align= "center",fig.cap="Fig. 8: Median price of property in towns based on county and region",fig.height=4,fig.width=10}
 knitr::include_graphics('./png/Median price of property in towns.png')
 ```
 
 When we compare the average house price for different Irish towns, we observed that towns in east of the country have high prices as compare to other parts. Dundrum, Maynooth and Smithfield which are near Dublin have high prices throughout. We also used time series to forecast the house prices for year 2020 and 2021.
 
-```{r, fig.align= "center",fig.height=4,fig.width=10}
+```{r, fig.align= "center",fig.height=4,fig.width=10,fig.cap="Fig. 9: Rate Change over year for major towns"}
 knitr::include_graphics('./png/Rate Change.png')
 ```
 
 
 When we compare average house price with total sale, we observed that total sale is high in east of the country again demonstrating economic inequality between east and rest of the country. Cluster shows that Maynooth has high sale and prices as compare to other towns.
 
-```{r, fig.align= "center",fig.height=4,fig.width=10}
+```{r, fig.align= "center",fig.height=4,fig.width=10,fig.cap="Fig. 10: Average House price vs Total sale price for four major towns"}
 knitr::include_graphics('./png/Average House price.png')
 ```
 
